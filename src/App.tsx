@@ -8,6 +8,7 @@ import { AuthProvider } from "@/lib/auth";
 import { useAuth } from "@/lib/auth";
 import Admin from "./pages/admin";
 import Embed from "./pages/Embed";
+import EmbedGenerator from "./pages/EmbedGenerator";
 import NotFound from "./pages/NotFound";
 import { AuthPage } from "./pages/AuthPage";
 import { Analytics } from "./pages/admin/Analytics";
@@ -46,6 +47,11 @@ const App = () => (
               </ProtectedRoute>
             } />
             <Route path="/embed" element={<Embed />} />
+            <Route path="/embed-generator" element={
+              <ProtectedRoute>
+                <EmbedGenerator />
+              </ProtectedRoute>
+            } />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

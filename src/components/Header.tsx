@@ -60,7 +60,7 @@ export const Header = () => {
         <NavLink to="/admin/analytics" current={location.pathname === "/admin/analytics"}>
           Analytics
         </NavLink>
-        <NavLink to="/embed" current={location.pathname === "/embed"}>
+        <NavLink to="/embed-generator" current={location.pathname === "/embed-generator"}>
           Embed Widget
         </NavLink>
       </nav>
@@ -87,7 +87,7 @@ export const Header = () => {
                 <Link to="/admin/analytics">Analytics</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/embed">Embed Widget</Link>
+                <Link to="/embed-generator">Embed Widget</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => signOut()} className="text-red-600">
@@ -120,7 +120,7 @@ export const Header = () => {
               <div className="flex flex-col space-y-4 mt-8">
                 <Link to="/admin" className="px-4 py-2 rounded-md hover:bg-gray-100">Dashboard</Link>
                 <Link to="/admin/analytics" className="px-4 py-2 rounded-md hover:bg-gray-100">Analytics</Link>
-                <Link to="/embed" className="px-4 py-2 rounded-md hover:bg-gray-100">Embed Widget</Link>
+                <Link to="/embed-generator" className="px-4 py-2 rounded-md hover:bg-gray-100">Embed Widget</Link>
                 {user ? (
                   <Button onClick={() => signOut()} variant="destructive">
                     <LogOut className="mr-2 h-4 w-4" />
