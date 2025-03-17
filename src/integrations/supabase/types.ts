@@ -17,6 +17,8 @@ export type Database = {
           id: string
           is_full_day: boolean | null
           reason: string
+          refund_amount: number | null
+          refund_provided: boolean | null
           start_time: string | null
           user_id: string
         }
@@ -27,6 +29,8 @@ export type Database = {
           id?: string
           is_full_day?: boolean | null
           reason: string
+          refund_amount?: number | null
+          refund_provided?: boolean | null
           start_time?: string | null
           user_id: string
         }
@@ -37,6 +41,8 @@ export type Database = {
           id?: string
           is_full_day?: boolean | null
           reason?: string
+          refund_amount?: number | null
+          refund_provided?: boolean | null
           start_time?: string | null
           user_id?: string
         }
@@ -73,10 +79,15 @@ export type Database = {
         Row: {
           accent_color: string
           animation: string
+          border_radius: string
+          border_width: string
           created_at: string
           description: string
+          font_style: string
           id: string
+          layout: string
           primary_color: string
+          shadow: string
           show_dates: boolean
           show_icon: boolean
           show_times: boolean
@@ -87,10 +98,15 @@ export type Database = {
         Insert: {
           accent_color?: string
           animation?: string
+          border_radius?: string
+          border_width?: string
           created_at?: string
           description?: string
+          font_style?: string
           id?: string
+          layout?: string
           primary_color?: string
+          shadow?: string
           show_dates?: boolean
           show_icon?: boolean
           show_times?: boolean
@@ -101,10 +117,15 @@ export type Database = {
         Update: {
           accent_color?: string
           animation?: string
+          border_radius?: string
+          border_width?: string
           created_at?: string
           description?: string
+          font_style?: string
           id?: string
+          layout?: string
           primary_color?: string
+          shadow?: string
           show_dates?: boolean
           show_icon?: boolean
           show_times?: boolean
