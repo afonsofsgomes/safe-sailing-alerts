@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAppStore } from '@/lib/store';
 import { Label } from '@/components/ui/label';
@@ -8,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Palette, Settings, CheckSquare, Type, Layout, BorderAll } from 'lucide-react';
+import { Loader2, Palette, Settings, CheckSquare, Type, Layout, Box } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { AlertWidget } from '@/components/AlertWidget';
 import { AuthModal } from '@/components/auth/AuthModal';

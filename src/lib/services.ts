@@ -6,7 +6,7 @@ import { Disruption, WidgetSettings } from './types';
 export const fetchDisruptions = async (): Promise<Disruption[]> => {
   const { data, error } = await supabase
     .from('disruptions')
-    .select('*, profiles(email)')
+    .select('*, profiles:user_id(email)')
     .order('date', { ascending: true });
 
   if (error) throw error;
@@ -43,7 +43,7 @@ export const createDisruption = async (disruption: Omit<Disruption, 'id' | 'crea
       refund_provided: disruption.refundProvided,
       refund_amount: disruption.refundProvided ? disruption.refundAmount : null
     })
-    .select('*, profiles(email)')
+    .select('*, profiles:user_id(email)')
     .single();
 
   if (error) throw error;
@@ -111,12 +111,12 @@ export const fetchWidgetSettings = async (): Promise<WidgetSettings | null> => {
     showDates: data.show_dates,
     showTimes: data.show_times,
     showIcon: data.show_icon,
-    animation: data.animation as any,
-    borderRadius: data.border_radius || 'medium',
-    shadow: data.shadow || 'medium',
-    fontStyle: data.font_style || 'default',
-    layout: data.layout || 'standard',
-    borderWidth: data.border_width || 'thin'
+    animation: data.animation as 'none' | 'fade' | 'slide' | 'wave',
+    borderRadius: data.border_radius as 'none' | 'small' | 'medium' | 'large' | 'pill',
+    shadow: data.shadow as 'none' | 'small' | 'medium' | 'large',
+    fontStyle: data.font_style as 'default' | 'serif' | 'mono',
+    layout: data.layout as 'standard' | 'compact' | 'minimal',
+    borderWidth: data.border_width as 'none' | 'thin' | 'medium' | 'thick'
   };
 };
 
