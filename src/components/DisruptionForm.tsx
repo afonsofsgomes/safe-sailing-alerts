@@ -8,7 +8,16 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { DialogFooter } from '@/components/ui/dialog';
-import { Loader2 } from 'lucide-react';
+import { Loader2, InfoIcon } from 'lucide-react';
+import { format, addDays, differenceInDays } from 'date-fns';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface DisruptionFormProps {
   initialDate?: Date;
@@ -20,7 +29,9 @@ export const DisruptionForm = ({ initialDate, onSuccess }: DisruptionFormProps) 
   const loading = useAppStore((state) => state.loading);
   const { toast } = useToast();
 
-  const [date, setDate] = useState<Date>(initialDate || new Date());
+  const [isDateRange, setIsDateRange] = useState<boolean>(false);
+  const [startDate, setStartDate] = useState<Date>(initialDate || new Date());
+  const [endDate, setEndDate] = useState<Date>(addDays(initialDate || new Date(), 1));
   const [startTime, setStartTime] = useState<string>('09:00');
   const [endTime, setEndTime] = useState<string>('17:00');
   const [reason, setReason] = useState<string>('Unfavorable weather conditions');
@@ -30,10 +41,19 @@ export const DisruptionForm = ({ initialDate, onSuccess }: DisruptionFormProps) 
     e.preventDefault();
 
     // Basic validation
-    if (!date) {
+    if (!startDate) {
       toast({
         title: "Error",
-        description: "Please select a date",
+        description: "Please select a start date",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (isDateRange && (!endDate || endDate < startDate)) {
+      toast({
+        title: "Error",
+        description: "End date must be after start date",
         variant: "destructive",
       });
       return;
@@ -58,19 +78,41 @@ export const DisruptionForm = ({ initialDate, onSuccess }: DisruptionFormProps) 
     }
 
     try {
-      // Add the new disruption
-      await addDisruption({
-        date,
-        startTime: isFullDay ? undefined : startTime,
-        endTime: isFullDay ? undefined : endTime,
-        reason,
-        isFullDay,
-      });
-
-      toast({
-        title: "Success",
-        description: "Disruption added successfully",
-      });
+      if (isDateRange) {
+        // Calculate days between dates
+        const daysDiff = differenceInDays(endDate, startDate);
+        
+        // Create a disruption for each day in the range
+        for (let i = 0; i <= daysDiff; i++) {
+          const currentDate = addDays(startDate, i);
+          await addDisruption({
+            date: currentDate,
+            startTime: isFullDay ? undefined : startTime,
+            endTime: isFullDay ? undefined : endTime,
+            reason,
+            isFullDay,
+          });
+        }
+        
+        toast({
+          title: "Success",
+          description: `${daysDiff + 1} disruptions added successfully`,
+        });
+      } else {
+        // Add a single disruption
+        await addDisruption({
+          date: startDate,
+          startTime: isFullDay ? undefined : startTime,
+          endTime: isFullDay ? undefined : endTime,
+          reason,
+          isFullDay,
+        });
+        
+        toast({
+          title: "Success",
+          description: "Disruption added successfully",
+        });
+      }
 
       // Call the success callback if provided
       if (onSuccess) {
@@ -87,16 +129,61 @@ export const DisruptionForm = ({ initialDate, onSuccess }: DisruptionFormProps) 
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="date">Date</Label>
-        <Input 
-          id="date" 
-          type="date" 
-          value={date ? date.toISOString().slice(0, 10) : ''}
-          onChange={(e) => setDate(new Date(e.target.value))}
-          required
+      <div className="flex items-center space-x-2 mb-4">
+        <Switch 
+          id="date-range" 
+          checked={isDateRange} 
+          onCheckedChange={setIsDateRange}
         />
+        <Label htmlFor="date-range">Add a date range</Label>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <InfoIcon className="h-4 w-4 text-gray-400" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Create multiple alerts for consecutive dates</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
+
+      {isDateRange ? (
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="start-date">Start Date</Label>
+            <Input 
+              id="start-date" 
+              type="date" 
+              value={startDate ? format(startDate, 'yyyy-MM-dd') : ''}
+              onChange={(e) => setStartDate(new Date(e.target.value))}
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="end-date">End Date</Label>
+            <Input 
+              id="end-date" 
+              type="date" 
+              value={endDate ? format(endDate, 'yyyy-MM-dd') : ''}
+              onChange={(e) => setEndDate(new Date(e.target.value))}
+              min={startDate ? format(startDate, 'yyyy-MM-dd') : ''}
+              required
+            />
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          <Label htmlFor="date">Date</Label>
+          <Input 
+            id="date" 
+            type="date" 
+            value={startDate ? format(startDate, 'yyyy-MM-dd') : ''}
+            onChange={(e) => setStartDate(new Date(e.target.value))}
+            required
+          />
+        </div>
+      )}
 
       <div className="flex items-center space-x-2">
         <Switch 

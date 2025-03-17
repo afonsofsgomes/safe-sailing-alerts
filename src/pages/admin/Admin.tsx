@@ -2,13 +2,14 @@
 import { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, ShieldAlert } from 'lucide-react';
+import { Loader2, ShieldAlert, BarChart2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth';
 import { AuthModal } from '@/components/auth/AuthModal';
 import { useAppStore } from '@/lib/store';
 import { AlertCalendar } from '@/components/AlertCalendar';
 import { WidgetSettings } from './WidgetSettings';
+import { Link } from 'react-router-dom';
 
 const Admin = () => {
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -33,10 +34,21 @@ const Admin = () => {
       
       <main className="flex-1 pt-24 pb-12 px-6 max-w-7xl mx-auto w-full">
         <div className="mb-10 animate-fade-in">
-          <h1 className="text-3xl font-bold text-gray-900">Alert Management</h1>
-          <p className="mt-2 text-gray-600">
-            Manage weather-related disruptions and customize your alert widget.
-          </p>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Alert Management</h1>
+              <p className="mt-2 text-gray-600">
+                Manage weather-related disruptions and customize your alert widget.
+              </p>
+            </div>
+            
+            <Link to="/admin/analytics">
+              <Button className="flex items-center gap-2">
+                <BarChart2 className="h-4 w-4" />
+                View Analytics
+              </Button>
+            </Link>
+          </div>
           
           {!user && (
             <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-3">
