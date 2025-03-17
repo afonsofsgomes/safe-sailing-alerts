@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/lib/auth";
 import Index from "./pages/Index";
-import Admin from "./pages/Admin";
+import Admin from "./pages/admin";
 import Embed from "./pages/Embed";
 import NotFound from "./pages/NotFound";
 

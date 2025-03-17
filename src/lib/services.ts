@@ -23,9 +23,15 @@ export const fetchDisruptions = async (): Promise<Disruption[]> => {
 };
 
 export const createDisruption = async (disruption: Omit<Disruption, 'id' | 'createdAt'>): Promise<Disruption> => {
+  // Get the current user
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) throw new Error('User not authenticated');
+
   const { data, error } = await supabase
     .from('disruptions')
     .insert({
+      user_id: user.id,
       date: disruption.date.toISOString().split('T')[0],
       start_time: disruption.startTime,
       end_time: disruption.endTime,
@@ -100,7 +106,14 @@ export const fetchWidgetSettings = async (): Promise<WidgetSettings | null> => {
 };
 
 export const updateWidgetSettings = async (settings: Partial<WidgetSettings>): Promise<void> => {
-  const updates: any = {};
+  // Get the current user
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) throw new Error('User not authenticated');
+
+  const updates: any = {
+    user_id: user.id
+  };
   
   if (settings.title !== undefined) updates.title = settings.title;
   if (settings.description !== undefined) updates.description = settings.description;
@@ -114,7 +127,8 @@ export const updateWidgetSettings = async (settings: Partial<WidgetSettings>): P
   // Try to update first
   const { error: updateError } = await supabase
     .from('widget_settings')
-    .update(updates);
+    .update(updates)
+    .eq('user_id', user.id);
 
   // If update fails, insert new record
   if (updateError) {

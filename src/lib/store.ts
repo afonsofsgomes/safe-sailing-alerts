@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Disruption, WidgetSettings } from './types';
@@ -168,6 +167,7 @@ export const formatDisruptionDate = (date: Date) => {
   });
 };
 
+// Fix formatDisruptionTime function to put required parameters first
 export const formatDisruptionTime = (isFullDay: boolean, startTime?: string, endTime?: string) => {
   if (isFullDay) return 'All Day';
   if (!startTime) return '';

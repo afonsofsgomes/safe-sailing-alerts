@@ -90,9 +90,9 @@ export const AlertWidget = ({ className, standalone = false }: AlertWidgetProps)
                     </span>
                     <span>
                       {formatDisruptionTime(
+                        disruption.isFullDay, 
                         disruption.startTime, 
-                        disruption.endTime, 
-                        disruption.isFullDay
+                        disruption.endTime
                       )}
                     </span>
                   </div>
