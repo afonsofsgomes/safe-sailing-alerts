@@ -83,7 +83,7 @@ export const formatDisruptionDate = (date: Date) => {
   });
 };
 
-export const formatDisruptionTime = (startTime?: string, endTime?: string, isFullDay: boolean) => {
+export const formatDisruptionTime = (isFullDay: boolean, startTime?: string, endTime?: string) => {
   if (isFullDay) return 'All Day';
   if (!startTime) return '';
   if (!endTime) return `From ${startTime}`;

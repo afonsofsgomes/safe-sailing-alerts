@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { DialogFooter } from '@/components/ui/dialog';
 
 interface DisruptionFormProps {
   initialDate?: Date;
