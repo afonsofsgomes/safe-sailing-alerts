@@ -1,10 +1,9 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { AlertCalendar } from '@/components/AlertCalendar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAppStore } from '@/lib/store';
-import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
@@ -13,25 +12,62 @@ import { AlertWidget } from '@/components/AlertWidget';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { Loader2, ShieldAlert } from 'lucide-react';
+import { useAuth } from '@/lib/auth';
+import { AuthModal } from '@/components/auth/AuthModal';
 
 const Admin = () => {
   const { toast } = useToast();
+  const { user, loading: authLoading } = useAuth();
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  
   const widgetSettings = useAppStore((state) => state.widgetSettings);
   const updateWidgetSettings = useAppStore((state) => state.updateWidgetSettings);
+  const fetchData = useAppStore((state) => state.fetchData);
+  const loading = useAppStore((state) => state.loading);
   
   const [localSettings, setLocalSettings] = useState(widgetSettings);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData, user]);
+
+  useEffect(() => {
+    setLocalSettings(widgetSettings);
+  }, [widgetSettings]);
 
   const handleSettingChange = (key: keyof typeof widgetSettings, value: any) => {
     setLocalSettings(prev => ({ ...prev, [key]: value }));
   };
 
-  const saveSettings = () => {
-    updateWidgetSettings(localSettings);
-    toast({
-      title: "Settings saved",
-      description: "Widget settings have been updated successfully",
-    });
+  const saveSettings = async () => {
+    if (!user) {
+      setAuthModalOpen(true);
+      return;
+    }
+    
+    try {
+      await updateWidgetSettings(localSettings);
+      toast({
+        title: "Settings saved",
+        description: "Widget settings have been updated successfully",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to save settings",
+        variant: "destructive",
+      });
+    }
   };
+
+  if (authLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -43,6 +79,25 @@ const Admin = () => {
           <p className="mt-2 text-gray-600">
             Manage weather-related disruptions and customize your alert widget.
           </p>
+          
+          {!user && (
+            <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-3">
+              <ShieldAlert className="h-5 w-5 text-amber-600" />
+              <div>
+                <p className="text-amber-800">Sign in to save your changes</p>
+                <p className="text-sm text-amber-700">
+                  <Button 
+                    variant="link" 
+                    className="p-0 h-auto text-amber-600" 
+                    onClick={() => setAuthModalOpen(true)}
+                  >
+                    Click here to sign in
+                  </Button> 
+                  {" "}or create an account to save your widget settings and disruptions.
+                </p>
+              </div>
+            </div>
+          )}
         </div>
         
         <Tabs defaultValue="calendar" className="w-full animate-fade-in">
@@ -175,8 +230,16 @@ const Admin = () => {
                 <Button 
                   onClick={saveSettings}
                   className="w-full mt-2 bg-sea-500 hover:bg-sea-600"
+                  disabled={loading}
                 >
-                  Save Settings
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    'Save Settings'
+                  )}
                 </Button>
               </div>
               
@@ -194,6 +257,11 @@ const Admin = () => {
           </TabsContent>
         </Tabs>
       </main>
+      
+      <AuthModal 
+        isOpen={authModalOpen} 
+        onClose={() => setAuthModalOpen(false)} 
+      />
     </div>
   );
 };

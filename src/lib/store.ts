@@ -2,19 +2,31 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Disruption, WidgetSettings } from './types';
+import { 
+  fetchDisruptions, 
+  createDisruption, 
+  updateDisruption as updateDisruptionService, 
+  deleteDisruption as deleteDisruptionService,
+  fetchWidgetSettings,
+  updateWidgetSettings as updateWidgetSettingsService
+} from './services';
 
 interface AppState {
   disruptions: Disruption[];
   widgetSettings: WidgetSettings;
-  addDisruption: (disruption: Omit<Disruption, 'id' | 'createdAt'>) => void;
-  removeDisruption: (id: string) => void;
-  updateDisruption: (id: string, disruption: Partial<Disruption>) => void;
-  updateWidgetSettings: (settings: Partial<WidgetSettings>) => void;
+  loading: boolean;
+  error: string | null;
+  // Actions
+  fetchData: () => Promise<void>;
+  addDisruption: (disruption: Omit<Disruption, 'id' | 'createdAt'>) => Promise<void>;
+  removeDisruption: (id: string) => Promise<void>;
+  updateDisruption: (id: string, disruption: Partial<Disruption>) => Promise<void>;
+  updateWidgetSettings: (settings: Partial<WidgetSettings>) => Promise<void>;
 }
 
 export const useAppStore = create<AppState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       disruptions: [],
       widgetSettings: {
         title: 'Alert: Unfavorable Weather Conditions',
@@ -26,31 +38,104 @@ export const useAppStore = create<AppState>()(
         showIcon: true,
         animation: 'wave',
       },
-      addDisruption: (disruption) => 
-        set((state) => ({
-          disruptions: [
-            ...state.disruptions,
-            { 
-              ...disruption, 
-              id: crypto.randomUUID(),
-              createdAt: new Date()
-            }
-          ]
-        })),
-      removeDisruption: (id) => 
-        set((state) => ({
-          disruptions: state.disruptions.filter(d => d.id !== id)
-        })),
-      updateDisruption: (id, disruption) => 
-        set((state) => ({
-          disruptions: state.disruptions.map(d => 
-            d.id === id ? { ...d, ...disruption } : d
-          )
-        })),
-      updateWidgetSettings: (settings) => 
-        set((state) => ({
-          widgetSettings: { ...state.widgetSettings, ...settings }
-        })),
+      loading: false,
+      error: null,
+      
+      fetchData: async () => {
+        try {
+          set({ loading: true, error: null });
+          const [disruptions, settings] = await Promise.all([
+            fetchDisruptions(),
+            fetchWidgetSettings()
+          ]);
+          
+          set({
+            disruptions,
+            widgetSettings: settings || get().widgetSettings,
+            loading: false
+          });
+        } catch (error: any) {
+          console.error('Error fetching data:', error);
+          set({
+            loading: false,
+            error: error.message || 'Failed to fetch data'
+          });
+        }
+      },
+      
+      addDisruption: async (disruption) => {
+        try {
+          set({ loading: true, error: null });
+          const newDisruption = await createDisruption(disruption);
+          set(state => ({
+            disruptions: [...state.disruptions, newDisruption],
+            loading: false
+          }));
+        } catch (error: any) {
+          console.error('Error adding disruption:', error);
+          set({
+            loading: false,
+            error: error.message || 'Failed to add disruption'
+          });
+          throw error;
+        }
+      },
+      
+      removeDisruption: async (id) => {
+        try {
+          set({ loading: true, error: null });
+          await deleteDisruptionService(id);
+          set(state => ({
+            disruptions: state.disruptions.filter(d => d.id !== id),
+            loading: false
+          }));
+        } catch (error: any) {
+          console.error('Error removing disruption:', error);
+          set({
+            loading: false,
+            error: error.message || 'Failed to remove disruption'
+          });
+          throw error;
+        }
+      },
+      
+      updateDisruption: async (id, disruption) => {
+        try {
+          set({ loading: true, error: null });
+          await updateDisruptionService(id, disruption);
+          set(state => ({
+            disruptions: state.disruptions.map(d => 
+              d.id === id ? { ...d, ...disruption } : d
+            ),
+            loading: false
+          }));
+        } catch (error: any) {
+          console.error('Error updating disruption:', error);
+          set({
+            loading: false,
+            error: error.message || 'Failed to update disruption'
+          });
+          throw error;
+        }
+      },
+      
+      updateWidgetSettings: async (settings) => {
+        try {
+          set({ loading: true, error: null });
+          await updateWidgetSettingsService(settings);
+          set(state => ({
+            widgetSettings: { ...state.widgetSettings, ...settings },
+            loading: false
+          }));
+        } catch (error: any) {
+          console.error('Error updating widget settings:', error);
+          set({
+            loading: false,
+            error: error.message || 'Failed to update widget settings'
+          });
+          throw error;
+        }
+      },
     }),
     {
       name: 'boat-tour-alerts-storage',

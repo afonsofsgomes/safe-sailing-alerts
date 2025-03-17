@@ -8,6 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { DialogFooter } from '@/components/ui/dialog';
+import { Loader2 } from 'lucide-react';
 
 interface DisruptionFormProps {
   initialDate?: Date;
@@ -16,6 +17,7 @@ interface DisruptionFormProps {
 
 export const DisruptionForm = ({ initialDate, onSuccess }: DisruptionFormProps) => {
   const addDisruption = useAppStore((state) => state.addDisruption);
+  const loading = useAppStore((state) => state.loading);
   const { toast } = useToast();
 
   const [date, setDate] = useState<Date>(initialDate || new Date());
@@ -24,7 +26,7 @@ export const DisruptionForm = ({ initialDate, onSuccess }: DisruptionFormProps) 
   const [reason, setReason] = useState<string>('Unfavorable weather conditions');
   const [isFullDay, setIsFullDay] = useState<boolean>(true);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Basic validation
@@ -55,23 +57,31 @@ export const DisruptionForm = ({ initialDate, onSuccess }: DisruptionFormProps) 
       return;
     }
 
-    // Add the new disruption
-    addDisruption({
-      date,
-      startTime: isFullDay ? undefined : startTime,
-      endTime: isFullDay ? undefined : endTime,
-      reason,
-      isFullDay,
-    });
+    try {
+      // Add the new disruption
+      await addDisruption({
+        date,
+        startTime: isFullDay ? undefined : startTime,
+        endTime: isFullDay ? undefined : endTime,
+        reason,
+        isFullDay,
+      });
 
-    toast({
-      title: "Success",
-      description: "Disruption added successfully",
-    });
+      toast({
+        title: "Success",
+        description: "Disruption added successfully",
+      });
 
-    // Call the success callback if provided
-    if (onSuccess) {
-      onSuccess();
+      // Call the success callback if provided
+      if (onSuccess) {
+        onSuccess();
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add disruption",
+        variant: "destructive",
+      });
     }
   };
 
@@ -134,7 +144,16 @@ export const DisruptionForm = ({ initialDate, onSuccess }: DisruptionFormProps) 
       </div>
 
       <DialogFooter>
-        <Button type="submit" className="w-full sm:w-auto">Save Disruption</Button>
+        <Button type="submit" className="w-full sm:w-auto" disabled={loading}>
+          {loading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            'Save Disruption'
+          )}
+        </Button>
       </DialogFooter>
     </form>
   );

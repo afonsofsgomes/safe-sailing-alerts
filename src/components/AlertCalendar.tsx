@@ -1,11 +1,11 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { useAppStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Loader2 } from 'lucide-react';
 import { 
   Dialog,
   DialogContent,
@@ -16,12 +16,23 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { DisruptionForm } from './DisruptionForm';
+import { useAuth } from '@/lib/auth';
+import { AuthModal } from './auth/AuthModal';
 
 export const AlertCalendar = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const { user } = useAuth();
+  
   const disruptions = useAppStore((state) => state.disruptions);
+  const loading = useAppStore((state) => state.loading);
+  const fetchData = useAppStore((state) => state.fetchData);
   const removeDisruption = useAppStore((state) => state.removeDisruption);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData, user]);
 
   // Function to check if a date has disruptions
   const hasDisruption = (date: Date) => {
@@ -49,6 +60,30 @@ export const AlertCalendar = () => {
     });
   };
 
+  const handleAddDisruption = () => {
+    if (!user) {
+      setAuthModalOpen(true);
+      return;
+    }
+    setIsDialogOpen(true);
+  };
+
+  const handleDeleteDisruption = async (id: string) => {
+    try {
+      await removeDisruption(id);
+    } catch (error) {
+      console.error("Failed to delete disruption:", error);
+    }
+  };
+
+  if (loading && disruptions.length === 0) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col lg:flex-row gap-6">
       <div className="flex-1 bg-white rounded-xl shadow-sm border p-5 animate-fade-in">
@@ -70,6 +105,7 @@ export const AlertCalendar = () => {
             <DialogTrigger asChild>
               <Button 
                 className="flex items-center gap-2 bg-sea-500 hover:bg-sea-600 transition-colors"
+                onClick={handleAddDisruption}
               >
                 Add Disruption
               </Button>
@@ -121,19 +157,31 @@ export const AlertCalendar = () => {
                   </div>
                   <p className="mt-2">{disruption.reason}</p>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removeDisruption(disruption.id)}
-                  className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                {user && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDeleteDisruption(disruption.id)}
+                    className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-4 w-4" />
+                    )}
+                  </Button>
+                )}
               </div>
             </div>
           ))}
         </div>
       </div>
+      
+      <AuthModal 
+        isOpen={authModalOpen} 
+        onClose={() => setAuthModalOpen(false)} 
+      />
     </div>
   );
 };

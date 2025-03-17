@@ -9,7 +9,111 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      disruptions: {
+        Row: {
+          created_at: string
+          date: string
+          end_time: string | null
+          id: string
+          is_full_day: boolean | null
+          reason: string
+          start_time: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          end_time?: string | null
+          id?: string
+          is_full_day?: boolean | null
+          reason: string
+          start_time?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          end_time?: string | null
+          id?: string
+          is_full_day?: boolean | null
+          reason?: string
+          start_time?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email: string
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      widget_settings: {
+        Row: {
+          accent_color: string
+          animation: string
+          created_at: string
+          description: string
+          id: string
+          primary_color: string
+          show_dates: boolean
+          show_icon: boolean
+          show_times: boolean
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          accent_color?: string
+          animation?: string
+          created_at?: string
+          description?: string
+          id?: string
+          primary_color?: string
+          show_dates?: boolean
+          show_icon?: boolean
+          show_times?: boolean
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          accent_color?: string
+          animation?: string
+          created_at?: string
+          description?: string
+          id?: string
+          primary_color?: string
+          show_dates?: boolean
+          show_icon?: boolean
+          show_times?: boolean
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
