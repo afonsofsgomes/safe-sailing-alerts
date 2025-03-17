@@ -7,6 +7,9 @@ export interface Disruption {
   reason: string;
   isFullDay: boolean;
   createdAt: Date;
+  refundProvided?: boolean;
+  refundAmount?: number;
+  createdByEmail?: string;
 }
 
 export interface WidgetSettings {
@@ -24,4 +27,3 @@ export interface WidgetSettings {
   layout: 'standard' | 'compact' | 'minimal';
   borderWidth: 'none' | 'thin' | 'medium' | 'thick';
 }
-

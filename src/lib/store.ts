@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Disruption, WidgetSettings } from './types';
@@ -18,7 +17,7 @@ interface AppState {
   error: string | null;
   // Actions
   fetchData: () => Promise<void>;
-  addDisruption: (disruption: Omit<Disruption, 'id' | 'createdAt'>) => Promise<void>;
+  addDisruption: (disruption: Omit<Disruption, 'id' | 'createdAt' | 'createdByEmail'>) => Promise<void>;
   removeDisruption: (id: string) => Promise<void>;
   updateDisruption: (id: string, disruption: Partial<Disruption>) => Promise<void>;
   updateWidgetSettings: (settings: Partial<WidgetSettings>) => Promise<void>;
@@ -148,7 +147,6 @@ export const useAppStore = create<AppState>()(
   )
 );
 
-// Helper functions for working with disruptions
 export const getActiveDisruptions = () => {
   const { disruptions } = useAppStore.getState();
   const today = new Date();
@@ -173,7 +171,6 @@ export const formatDisruptionDate = (date: Date) => {
   });
 };
 
-// Fix formatDisruptionTime function to put required parameters first
 export const formatDisruptionTime = (isFullDay: boolean, startTime?: string, endTime?: string) => {
   if (isFullDay) return 'All Day';
   if (!startTime) return '';

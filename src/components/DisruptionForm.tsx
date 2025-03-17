@@ -8,7 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { DialogFooter } from '@/components/ui/dialog';
-import { Loader2, InfoIcon } from 'lucide-react';
+import { Loader2, InfoIcon, Euro } from 'lucide-react';
 import { format, addDays, differenceInDays } from 'date-fns';
 import {
   Select,
@@ -36,6 +36,8 @@ export const DisruptionForm = ({ initialDate, onSuccess }: DisruptionFormProps) 
   const [endTime, setEndTime] = useState<string>('17:00');
   const [reason, setReason] = useState<string>('Unfavorable weather conditions');
   const [isFullDay, setIsFullDay] = useState<boolean>(true);
+  const [refundProvided, setRefundProvided] = useState<boolean>(false);
+  const [refundAmount, setRefundAmount] = useState<number>(0);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,6 +79,15 @@ export const DisruptionForm = ({ initialDate, onSuccess }: DisruptionFormProps) 
       return;
     }
 
+    if (refundProvided && (refundAmount <= 0)) {
+      toast({
+        title: "Error",
+        description: "Please enter a valid refund amount",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       if (isDateRange) {
         // Calculate days between dates
@@ -91,6 +102,8 @@ export const DisruptionForm = ({ initialDate, onSuccess }: DisruptionFormProps) 
             endTime: isFullDay ? undefined : endTime,
             reason,
             isFullDay,
+            refundProvided,
+            refundAmount: refundProvided ? refundAmount : undefined
           });
         }
         
@@ -106,6 +119,8 @@ export const DisruptionForm = ({ initialDate, onSuccess }: DisruptionFormProps) 
           endTime: isFullDay ? undefined : endTime,
           reason,
           isFullDay,
+          refundProvided,
+          refundAmount: refundProvided ? refundAmount : undefined
         });
         
         toast({
@@ -229,6 +244,44 @@ export const DisruptionForm = ({ initialDate, onSuccess }: DisruptionFormProps) 
           required
         />
       </div>
+
+      <div className="flex items-center space-x-2 pt-2">
+        <Switch 
+          id="refund-provided" 
+          checked={refundProvided} 
+          onCheckedChange={setRefundProvided}
+        />
+        <Label htmlFor="refund-provided">Refund needed</Label>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <InfoIcon className="h-4 w-4 text-gray-400" />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Check this if refund was needed for this disruption</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+
+      {refundProvided && (
+        <div className="space-y-2">
+          <Label htmlFor="refund-amount">Refund Amount (€)</Label>
+          <div className="relative">
+            <Euro className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
+            <Input 
+              id="refund-amount" 
+              type="number" 
+              min="0" 
+              step="0.01"
+              className="pl-10"
+              value={refundAmount}
+              onChange={(e) => setRefundAmount(parseFloat(e.target.value))}
+              required={refundProvided}
+            />
+          </div>
+        </div>
+      )}
 
       <DialogFooter>
         <Button type="submit" className="w-full sm:w-auto" disabled={loading}>

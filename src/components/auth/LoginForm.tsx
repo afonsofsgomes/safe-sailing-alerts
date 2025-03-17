@@ -12,7 +12,7 @@ interface LoginFormProps {
   onRegisterClick: () => void;
 }
 
-export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
+export function LoginForm({ onSuccess }: LoginFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -93,13 +93,8 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
         </Button>
       </form>
       
-      <div className="text-center">
-        <p className="text-sm text-gray-500">
-          Don't have an account?{' '}
-          <Button variant="link" className="p-0 h-auto" onClick={onRegisterClick}>
-            Register
-          </Button>
-        </p>
+      <div className="text-center text-sm text-gray-500">
+        <p>Contact your administrator for login credentials</p>
       </div>
     </div>
   );

@@ -6,7 +6,7 @@ import { Disruption, WidgetSettings } from './types';
 export const fetchDisruptions = async (): Promise<Disruption[]> => {
   const { data, error } = await supabase
     .from('disruptions')
-    .select('*')
+    .select('*, profiles(email)')
     .order('date', { ascending: true });
 
   if (error) throw error;
@@ -18,11 +18,14 @@ export const fetchDisruptions = async (): Promise<Disruption[]> => {
     endTime: item.end_time || undefined,
     reason: item.reason,
     isFullDay: item.is_full_day,
-    createdAt: new Date(item.created_at)
+    createdAt: new Date(item.created_at),
+    refundProvided: item.refund_provided || false,
+    refundAmount: item.refund_amount || 0,
+    createdByEmail: item.profiles?.email
   }));
 };
 
-export const createDisruption = async (disruption: Omit<Disruption, 'id' | 'createdAt'>): Promise<Disruption> => {
+export const createDisruption = async (disruption: Omit<Disruption, 'id' | 'createdAt' | 'createdByEmail'>): Promise<Disruption> => {
   // Get the current user
   const { data: { user } } = await supabase.auth.getUser();
   
@@ -36,9 +39,11 @@ export const createDisruption = async (disruption: Omit<Disruption, 'id' | 'crea
       start_time: disruption.startTime,
       end_time: disruption.endTime,
       reason: disruption.reason,
-      is_full_day: disruption.isFullDay
+      is_full_day: disruption.isFullDay,
+      refund_provided: disruption.refundProvided,
+      refund_amount: disruption.refundProvided ? disruption.refundAmount : null
     })
-    .select()
+    .select('*, profiles(email)')
     .single();
 
   if (error) throw error;
@@ -50,7 +55,10 @@ export const createDisruption = async (disruption: Omit<Disruption, 'id' | 'crea
     endTime: data.end_time || undefined,
     reason: data.reason,
     isFullDay: data.is_full_day,
-    createdAt: new Date(data.created_at)
+    createdAt: new Date(data.created_at),
+    refundProvided: data.refund_provided || false,
+    refundAmount: data.refund_amount || 0,
+    createdByEmail: data.profiles?.email
   };
 };
 
@@ -62,6 +70,8 @@ export const updateDisruption = async (id: string, disruption: Partial<Disruptio
   if (disruption.endTime !== undefined) updates.end_time = disruption.endTime;
   if (disruption.reason !== undefined) updates.reason = disruption.reason;
   if (disruption.isFullDay !== undefined) updates.is_full_day = disruption.isFullDay;
+  if (disruption.refundProvided !== undefined) updates.refund_provided = disruption.refundProvided;
+  if (disruption.refundAmount !== undefined) updates.refund_amount = disruption.refundAmount;
 
   const { error } = await supabase
     .from('disruptions')
@@ -116,9 +126,7 @@ export const updateWidgetSettings = async (settings: Partial<WidgetSettings>): P
   
   if (!user) throw new Error('User not authenticated');
 
-  const updates: any = {
-    user_id: user.id
-  };
+  const updates: any = {};
   
   if (settings.title !== undefined) updates.title = settings.title;
   if (settings.description !== undefined) updates.description = settings.description;
@@ -134,18 +142,27 @@ export const updateWidgetSettings = async (settings: Partial<WidgetSettings>): P
   if (settings.layout !== undefined) updates.layout = settings.layout;
   if (settings.borderWidth !== undefined) updates.border_width = settings.borderWidth;
 
-  // Try to update first
-  const { error: updateError } = await supabase
+  // Get all widget settings
+  const { data } = await supabase
     .from('widget_settings')
-    .update(updates)
-    .eq('user_id', user.id);
-
-  // If update fails, insert new record
-  if (updateError) {
+    .select('*');
+  
+  if (!data || data.length === 0) {
+    // If no settings exist, insert new one
     const { error: insertError } = await supabase
       .from('widget_settings')
-      .insert(updates);
+      .insert({
+        ...updates,
+        user_id: user.id
+      });
     
     if (insertError) throw insertError;
+  } else {
+    // Update all settings to ensure all users see the same widget settings
+    const { error: updateError } = await supabase
+      .from('widget_settings')
+      .update(updates);
+    
+    if (updateError) throw updateError;
   }
 };

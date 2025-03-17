@@ -54,11 +54,11 @@ export const Header = () => {
       </div>
 
       <nav className="hidden md:flex items-center space-x-8">
-        <NavLink to="/" current={location.pathname === "/"}>
-          Home
-        </NavLink>
         <NavLink to="/admin" current={location.pathname === "/admin"}>
-          Admin
+          Dashboard
+        </NavLink>
+        <NavLink to="/admin/analytics" current={location.pathname === "/admin/analytics"}>
+          Analytics
         </NavLink>
         <NavLink to="/embed" current={location.pathname === "/embed"}>
           Embed Widget
@@ -82,6 +82,9 @@ export const Header = () => {
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
                 <Link to="/admin">Manage Alerts</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/admin/analytics">Analytics</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link to="/embed">Embed Widget</Link>
@@ -115,8 +118,8 @@ export const Header = () => {
             </SheetTrigger>
             <SheetContent>
               <div className="flex flex-col space-y-4 mt-8">
-                <Link to="/" className="px-4 py-2 rounded-md hover:bg-gray-100">Home</Link>
-                <Link to="/admin" className="px-4 py-2 rounded-md hover:bg-gray-100">Admin</Link>
+                <Link to="/admin" className="px-4 py-2 rounded-md hover:bg-gray-100">Dashboard</Link>
+                <Link to="/admin/analytics" className="px-4 py-2 rounded-md hover:bg-gray-100">Analytics</Link>
                 <Link to="/embed" className="px-4 py-2 rounded-md hover:bg-gray-100">Embed Widget</Link>
                 {user ? (
                   <Button onClick={() => signOut()} variant="destructive">
