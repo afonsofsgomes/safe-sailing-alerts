@@ -1,3 +1,4 @@
+
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Disruption, WidgetSettings } from './types';
@@ -36,6 +37,11 @@ export const useAppStore = create<AppState>()(
         showTimes: true,
         showIcon: true,
         animation: 'wave',
+        borderRadius: 'medium',
+        shadow: 'medium',
+        fontStyle: 'default',
+        layout: 'standard',
+        borderWidth: 'thin'
       },
       loading: false,
       error: null,

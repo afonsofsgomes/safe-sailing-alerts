@@ -22,6 +22,45 @@ export const AlertWidget = ({ className, standalone = false }: AlertWidgetProps)
   
   if (activeDisruptions.length === 0) return null;
 
+  const getBorderRadiusClass = () => {
+    switch (widgetSettings.borderRadius) {
+      case 'none': return 'rounded-none';
+      case 'small': return 'rounded-sm';
+      case 'medium': return 'rounded-lg';
+      case 'large': return 'rounded-xl';
+      case 'pill': return 'rounded-full';
+      default: return 'rounded-lg';
+    }
+  };
+
+  const getShadowClass = () => {
+    switch (widgetSettings.shadow) {
+      case 'none': return 'shadow-none';
+      case 'small': return 'shadow-sm';
+      case 'medium': return 'shadow-lg';
+      case 'large': return 'shadow-xl';
+      default: return 'shadow-lg';
+    }
+  };
+
+  const getFontClass = () => {
+    switch (widgetSettings.fontStyle) {
+      case 'serif': return 'font-serif';
+      case 'mono': return 'font-mono';
+      default: return 'font-sans';
+    }
+  };
+
+  const getBorderWidthClass = () => {
+    switch (widgetSettings.borderWidth) {
+      case 'none': return 'border-0';
+      case 'thin': return 'border';
+      case 'medium': return 'border-2';
+      case 'thick': return 'border-4';
+      default: return 'border';
+    }
+  };
+
   const getAnimationClass = () => {
     switch (widgetSettings.animation) {
       case 'fade':
@@ -32,6 +71,17 @@ export const AlertWidget = ({ className, standalone = false }: AlertWidgetProps)
         return '';
       default:
         return '';
+    }
+  };
+
+  const getLayoutClasses = () => {
+    switch (widgetSettings.layout) {
+      case 'compact':
+        return 'p-3';
+      case 'minimal':
+        return 'p-2';
+      default:
+        return 'p-4';
     }
   };
 
@@ -50,15 +100,20 @@ export const AlertWidget = ({ className, standalone = false }: AlertWidgetProps)
   return (
     <div 
       className={cn(
-        'alert-widget p-4 rounded-lg shadow-lg text-white overflow-hidden',
+        'alert-widget overflow-hidden',
+        getBorderRadiusClass(),
+        getShadowClass(),
+        getFontClass(),
+        getBorderWidthClass(),
+        getLayoutClasses(),
         getAnimationClass(),
+        'text-white',
         standalone ? 'max-w-lg mx-auto my-4' : '',
         className
       )}
       style={{ 
         backgroundColor: widgetSettings.primaryColor,
         borderColor: widgetSettings.accentColor,
-        borderWidth: '1px'
       }}
     >
       <div className="relative z-10">

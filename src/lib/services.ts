@@ -101,7 +101,12 @@ export const fetchWidgetSettings = async (): Promise<WidgetSettings | null> => {
     showDates: data.show_dates,
     showTimes: data.show_times,
     showIcon: data.show_icon,
-    animation: data.animation as any
+    animation: data.animation as any,
+    borderRadius: data.border_radius || 'medium',
+    shadow: data.shadow || 'medium',
+    fontStyle: data.font_style || 'default',
+    layout: data.layout || 'standard',
+    borderWidth: data.border_width || 'thin'
   };
 };
 
@@ -123,6 +128,11 @@ export const updateWidgetSettings = async (settings: Partial<WidgetSettings>): P
   if (settings.showTimes !== undefined) updates.show_times = settings.showTimes;
   if (settings.showIcon !== undefined) updates.show_icon = settings.showIcon;
   if (settings.animation !== undefined) updates.animation = settings.animation;
+  if (settings.borderRadius !== undefined) updates.border_radius = settings.borderRadius;
+  if (settings.shadow !== undefined) updates.shadow = settings.shadow;
+  if (settings.fontStyle !== undefined) updates.font_style = settings.fontStyle;
+  if (settings.layout !== undefined) updates.layout = settings.layout;
+  if (settings.borderWidth !== undefined) updates.border_width = settings.borderWidth;
 
   // Try to update first
   const { error: updateError } = await supabase

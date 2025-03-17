@@ -18,4 +18,10 @@ export interface WidgetSettings {
   showTimes: boolean;
   showIcon: boolean;
   animation: 'none' | 'fade' | 'slide' | 'wave';
+  borderRadius: 'none' | 'small' | 'medium' | 'large' | 'pill';
+  shadow: 'none' | 'small' | 'medium' | 'large';
+  fontStyle: 'default' | 'serif' | 'mono';
+  layout: 'standard' | 'compact' | 'minimal';
+  borderWidth: 'none' | 'thin' | 'medium' | 'thick';
 }
+

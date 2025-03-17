@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { Copy, Check, Code2 } from 'lucide-react';
 import { useAppStore } from '@/lib/store';
+import { Card, CardContent } from '@/components/ui/card';
 
 function Embed() {
   const { toast } = useToast();
@@ -54,16 +55,16 @@ function Embed() {
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="space-y-6 bg-white p-6 rounded-xl shadow-sm border animate-fade-in">
+          <Card className="overflow-hidden animate-fade-in">
             <Tabs defaultValue="iframe">
-              <TabsList>
+              <TabsList className="m-4">
                 <TabsTrigger value="iframe">
                   <Code2 className="h-4 w-4 mr-2" />
                   iFrame Embed
                 </TabsTrigger>
               </TabsList>
               
-              <TabsContent value="iframe" className="mt-4">
+              <TabsContent value="iframe" className="p-4 pt-0">
                 <div className="space-y-4">
                   <p className="text-sm text-gray-600">
                     Copy and paste this code into your website's HTML where you want the widget to appear:
@@ -93,13 +94,15 @@ function Embed() {
                 </div>
               </TabsContent>
             </Tabs>
-          </div>
+          </Card>
           
           <div className="space-y-6 animate-fade-in">
             <h3 className="text-xl font-semibold">Widget Preview</h3>
-            <div className="bg-white p-6 rounded-xl shadow-sm border">
-              <AlertWidget standalone={true} />
-            </div>
+            <Card className="p-6">
+              <CardContent className="p-0">
+                <AlertWidget standalone={true} />
+              </CardContent>
+            </Card>
             <p className="text-sm text-muted-foreground">
               This is how your alert widget will appear on your website.
               To customize the appearance, go to the Admin page.
