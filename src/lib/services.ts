@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Disruption, WidgetSettings } from './types';
 
@@ -6,7 +5,7 @@ import { Disruption, WidgetSettings } from './types';
 export const fetchDisruptions = async (): Promise<Disruption[]> => {
   const { data, error } = await supabase
     .from('disruptions')
-    .select('*, profiles:user_id(email)')
+    .select('*')
     .order('date', { ascending: true });
 
   if (error) throw error;
@@ -21,7 +20,7 @@ export const fetchDisruptions = async (): Promise<Disruption[]> => {
     createdAt: new Date(item.created_at),
     refundProvided: item.refund_provided || false,
     refundAmount: item.refund_amount || 0,
-    createdByEmail: item.profiles?.email
+    createdByEmail: undefined
   }));
 };
 
@@ -43,7 +42,7 @@ export const createDisruption = async (disruption: Omit<Disruption, 'id' | 'crea
       refund_provided: disruption.refundProvided,
       refund_amount: disruption.refundProvided ? disruption.refundAmount : null
     })
-    .select('*, profiles:user_id(email)')
+    .select()
     .single();
 
   if (error) throw error;
@@ -58,7 +57,7 @@ export const createDisruption = async (disruption: Omit<Disruption, 'id' | 'crea
     createdAt: new Date(data.created_at),
     refundProvided: data.refund_provided || false,
     refundAmount: data.refund_amount || 0,
-    createdByEmail: data.profiles?.email
+    createdByEmail: undefined
   };
 };
 
@@ -158,10 +157,12 @@ export const updateWidgetSettings = async (settings: Partial<WidgetSettings>): P
     
     if (insertError) throw insertError;
   } else {
-    // Update all settings to ensure all users see the same widget settings
+    // Update settings row by ID to ensure we have a proper WHERE clause
+    const settingId = data[0].id;
     const { error: updateError } = await supabase
       .from('widget_settings')
-      .update(updates);
+      .update(updates)
+      .eq('id', settingId);
     
     if (updateError) throw updateError;
   }
