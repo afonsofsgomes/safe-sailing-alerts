@@ -119,4 +119,19 @@
     mask-size: 100% 100%;
     mask-repeat: no-repeat;
   }
+  
+  /* Embed widget container styles */
+  .embed-widget-container {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow: hidden;
+  }
+  
+  /* When in embed mode, remove padding from standalone widget */
+  .embed-widget-container .alert-widget {
+    margin: 0 !important;
+    width: 100%;
+    max-width: 100%;
+  }
 }

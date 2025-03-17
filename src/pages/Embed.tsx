@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { AlertWidget } from '@/components/AlertWidget';
 import { useAppStore } from '@/lib/store';
 
@@ -11,7 +11,7 @@ function EmbedWidget() {
   }, [fetchData]);
 
   return (
-    <div className="p-2 embed-container">
+    <div className="embed-widget-container">
       <AlertWidget standalone={true} />
     </div>
   );

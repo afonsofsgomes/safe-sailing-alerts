@@ -9,7 +9,7 @@ export const WidgetPreview = ({ className }: WidgetPreviewProps) => {
   return (
     <div className={`space-y-6 animate-fade-in ${className}`}>
       <h3 className="text-xl font-semibold">Widget Preview</h3>
-      <div className="bg-white p-6 rounded-xl shadow-sm border">
+      <div className="bg-white p-6 rounded-xl shadow-sm border overflow-hidden">
         <AlertWidget standalone={true} />
       </div>
       <p className="text-sm text-muted-foreground">
