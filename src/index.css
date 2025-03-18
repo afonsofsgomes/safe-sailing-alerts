@@ -91,19 +91,12 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
-  /* Inter var font */
-  @font-face {
-    font-family: 'Inter var';
-    font-weight: 100 900;
-    font-display: swap;
-    font-style: normal;
-    font-named-instance: 'Regular';
-    src: url("https://rsms.me/inter/font-files/Inter-roman.var.woff2?v=3.19") format("woff2");
-  }
+  /* We're removing the problematic Inter font reference that was causing the 404 error */
+  /* and will use Google Fonts instead - this is added to index.html */
 }
 
 @layer components {
