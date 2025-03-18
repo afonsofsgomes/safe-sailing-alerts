@@ -8,7 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { DialogFooter } from '@/components/ui/dialog';
-import { Loader2, InfoIcon, Euro } from 'lucide-react';
+import { Loader2, InfoIcon, Euro, Share2 } from 'lucide-react';
 import { format, addDays, differenceInDays } from 'date-fns';
 import {
   Select,
@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { fetchSocialMediaSettings } from '@/lib/services';
 
 interface DisruptionFormProps {
   initialDate?: Date;
@@ -38,6 +39,32 @@ export const DisruptionForm = ({ initialDate, onSuccess }: DisruptionFormProps) 
   const [isFullDay, setIsFullDay] = useState<boolean>(true);
   const [refundProvided, setRefundProvided] = useState<boolean>(false);
   const [refundAmount, setRefundAmount] = useState<number>(0);
+  const [postToSocial, setPostToSocial] = useState<boolean>(true);
+  const [socialSettingsChecked, setSocialSettingsChecked] = useState<boolean>(false);
+  const [socialEnabled, setSocialEnabled] = useState<boolean>(false);
+
+  // Check if social media posting is enabled
+  const checkSocialSettings = async () => {
+    if (socialSettingsChecked) return;
+    
+    try {
+      const settings = await fetchSocialMediaSettings();
+      const isEnabled = settings?.enabled ?? false;
+      setSocialEnabled(isEnabled);
+      setPostToSocial(isEnabled);
+      setSocialSettingsChecked(true);
+    } catch (error) {
+      console.error('Error fetching social media settings:', error);
+      setSocialEnabled(false);
+      setPostToSocial(false);
+      setSocialSettingsChecked(true);
+    }
+  };
+  
+  // Call this function when the component mounts
+  useState(() => {
+    checkSocialSettings();
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,7 +136,7 @@ export const DisruptionForm = ({ initialDate, onSuccess }: DisruptionFormProps) 
         
         toast({
           title: "Success",
-          description: `${daysDiff + 1} disruptions added successfully`,
+          description: `${daysDiff + 1} disruptions added successfully${postToSocial && socialEnabled ? ' and posted to social media' : ''}`,
         });
       } else {
         // Add a single disruption
@@ -125,7 +152,7 @@ export const DisruptionForm = ({ initialDate, onSuccess }: DisruptionFormProps) 
         
         toast({
           title: "Success",
-          description: "Disruption added successfully",
+          description: `Disruption added successfully${postToSocial && socialEnabled ? ' and posted to social media' : ''}`,
         });
       }
 
@@ -280,6 +307,30 @@ export const DisruptionForm = ({ initialDate, onSuccess }: DisruptionFormProps) 
               required={refundProvided}
             />
           </div>
+        </div>
+      )}
+      
+      {socialSettingsChecked && socialEnabled && (
+        <div className="flex items-center space-x-2 pt-2">
+          <Switch 
+            id="post-to-social" 
+            checked={postToSocial} 
+            onCheckedChange={setPostToSocial}
+          />
+          <Label htmlFor="post-to-social" className="flex items-center gap-1.5">
+            <Share2 className="h-4 w-4 text-gray-600" />
+            Post to social media
+          </Label>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <InfoIcon className="h-4 w-4 text-gray-400" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Share this alert on configured social media platforms</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       )}
 

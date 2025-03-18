@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { Disruption, WidgetSettings } from './types';
+import { Disruption, WidgetSettings, SocialMediaSettings } from './types';
 
 // Disruption Services
 export const fetchDisruptions = async (): Promise<Disruption[]> => {
@@ -25,7 +25,6 @@ export const fetchDisruptions = async (): Promise<Disruption[]> => {
 };
 
 export const createDisruption = async (disruption: Omit<Disruption, 'id' | 'createdAt' | 'createdByEmail'>): Promise<Disruption> => {
-  // Get the current user
   const { data: { user } } = await supabase.auth.getUser();
   
   if (!user) throw new Error('User not authenticated');
@@ -46,6 +45,22 @@ export const createDisruption = async (disruption: Omit<Disruption, 'id' | 'crea
     .single();
 
   if (error) throw error;
+
+  try {
+    const socialSettings = await fetchSocialMediaSettings();
+    
+    if (socialSettings?.enabled && socialSettings?.postSettings?.autoPost) {
+      await supabase.functions.invoke('social-media-post', {
+        body: {
+          disruptionId: data.id,
+          platforms: socialSettings.platforms,
+          postSettings: socialSettings.postSettings
+        }
+      });
+    }
+  } catch (postError) {
+    console.error('Error creating social media post:', postError);
+  }
 
   return {
     id: data.id,
@@ -120,7 +135,6 @@ export const fetchWidgetSettings = async (): Promise<WidgetSettings | null> => {
 };
 
 export const updateWidgetSettings = async (settings: Partial<WidgetSettings>): Promise<void> => {
-  // Get the current user
   const { data: { user } } = await supabase.auth.getUser();
   
   if (!user) throw new Error('User not authenticated');
@@ -141,13 +155,11 @@ export const updateWidgetSettings = async (settings: Partial<WidgetSettings>): P
   if (settings.layout !== undefined) updates.layout = settings.layout;
   if (settings.borderWidth !== undefined) updates.border_width = settings.borderWidth;
 
-  // Get all widget settings
   const { data } = await supabase
     .from('widget_settings')
     .select('*');
   
   if (!data || data.length === 0) {
-    // If no settings exist, insert new one
     const { error: insertError } = await supabase
       .from('widget_settings')
       .insert({
@@ -157,7 +169,6 @@ export const updateWidgetSettings = async (settings: Partial<WidgetSettings>): P
     
     if (insertError) throw insertError;
   } else {
-    // Update settings row by ID to ensure we have a proper WHERE clause
     const settingId = data[0].id;
     const { error: updateError } = await supabase
       .from('widget_settings')
@@ -166,4 +177,90 @@ export const updateWidgetSettings = async (settings: Partial<WidgetSettings>): P
     
     if (updateError) throw updateError;
   }
+};
+
+// Social Media Settings Services
+export const fetchSocialMediaSettings = async (): Promise<SocialMediaSettings | null> => {
+  const { data, error } = await supabase
+    .from('social_media_settings')
+    .select('*')
+    .limit(1)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null; // No rows returned
+    throw error;
+  }
+
+  return {
+    id: data.id,
+    enabled: data.enabled,
+    platforms: data.platforms,
+    postSettings: data.post_settings,
+    userId: data.user_id,
+    createdAt: new Date(data.created_at),
+    updatedAt: new Date(data.updated_at)
+  };
+};
+
+export const updateSocialMediaSettings = async (settings: Partial<SocialMediaSettings>): Promise<void> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) throw new Error('User not authenticated');
+
+  const updates: any = {};
+  
+  if (settings.enabled !== undefined) updates.enabled = settings.enabled;
+  if (settings.platforms !== undefined) updates.platforms = settings.platforms;
+  if (settings.postSettings !== undefined) updates.post_settings = settings.postSettings;
+
+  const { data } = await supabase
+    .from('social_media_settings')
+    .select('*');
+  
+  if (!data || data.length === 0) {
+    const { error: insertError } = await supabase
+      .from('social_media_settings')
+      .insert({
+        ...updates,
+        user_id: user.id,
+        enabled: settings.enabled ?? true,
+        platforms: settings.platforms ?? {
+          facebook: { enabled: false },
+          instagram: { enabled: false }
+        },
+        post_settings: settings.postSettings ?? {
+          includeImage: true,
+          message: "Alert: Our services will be disrupted on {date} due to {reason}.",
+          hashtags: ["weatheralert", "servicedisruption"],
+          autoPost: true
+        }
+      });
+    
+    if (insertError) throw insertError;
+  } else {
+    const settingId = data[0].id;
+    const { error: updateError } = await supabase
+      .from('social_media_settings')
+      .update(updates)
+      .eq('id', settingId);
+    
+    if (updateError) throw updateError;
+  }
+};
+
+export const manualPostToSocial = async (disruptionId: string): Promise<void> => {
+  const socialSettings = await fetchSocialMediaSettings();
+  
+  if (!socialSettings?.enabled) {
+    throw new Error('Social media posting is not enabled');
+  }
+  
+  await supabase.functions.invoke('social-media-post', {
+    body: {
+      disruptionId,
+      platforms: socialSettings.platforms,
+      postSettings: socialSettings.postSettings
+    }
+  });
 };

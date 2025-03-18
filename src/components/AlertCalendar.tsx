@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 import { useAppStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Loader2 } from 'lucide-react';
+import { Trash2, Loader2, Share2 } from 'lucide-react';
 import { 
   Dialog,
   DialogContent,
@@ -18,17 +18,22 @@ import {
 import { DisruptionForm } from './DisruptionForm';
 import { useAuth } from '@/lib/auth';
 import { AuthModal } from './auth/AuthModal';
+import { useToast } from '@/hooks/use-toast';
 
 export const AlertCalendar = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [sharingId, setSharingId] = useState<string | null>(null);
   const { user } = useAuth();
+  const { toast } = useToast();
   
   const disruptions = useAppStore((state) => state.disruptions);
   const loading = useAppStore((state) => state.loading);
   const fetchData = useAppStore((state) => state.fetchData);
   const removeDisruption = useAppStore((state) => state.removeDisruption);
+  const postDisruptionToSocial = useAppStore((state) => state.postDisruptionToSocial);
+  const socialMediaSettings = useAppStore((state) => state.socialMediaSettings);
 
   useEffect(() => {
     fetchData();
@@ -73,6 +78,40 @@ export const AlertCalendar = () => {
       await removeDisruption(id);
     } catch (error) {
       console.error("Failed to delete disruption:", error);
+    }
+  };
+  
+  const handleShareToSocial = async (id: string) => {
+    if (!user) {
+      setAuthModalOpen(true);
+      return;
+    }
+    
+    if (!socialMediaSettings?.enabled) {
+      toast({
+        title: "Social Media Disabled",
+        description: "Please enable social media posting in the Widget Settings tab",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    try {
+      setSharingId(id);
+      await postDisruptionToSocial(id);
+      toast({
+        title: "Success",
+        description: "Alert shared to social media successfully",
+      });
+    } catch (error) {
+      console.error("Failed to share to social media:", error);
+      toast({
+        title: "Error",
+        description: "Failed to share to social media",
+        variant: "destructive",
+      });
+    } finally {
+      setSharingId(null);
     }
   };
 
@@ -158,19 +197,36 @@ export const AlertCalendar = () => {
                   <p className="mt-2">{disruption.reason}</p>
                 </div>
                 {user && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDeleteDisruption(disruption.id)}
-                    className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                    disabled={loading}
-                  >
-                    {loading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Trash2 className="h-4 w-4" />
-                    )}
-                  </Button>
+                  <div className="flex gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleShareToSocial(disruption.id)}
+                      className="text-blue-500 hover:text-blue-700 hover:bg-blue-50"
+                      disabled={loading || sharingId === disruption.id}
+                      title="Share to social media"
+                    >
+                      {sharingId === disruption.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Share2 className="h-4 w-4" />
+                      )}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDeleteDisruption(disruption.id)}
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                      disabled={loading}
+                      title="Delete disruption"
+                    >
+                      {loading && sharingId !== disruption.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
                 )}
               </div>
             </div>
