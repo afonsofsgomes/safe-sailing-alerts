@@ -1,17 +1,49 @@
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { AlertWidget } from '@/components/AlertWidget';
 import { useAppStore } from '@/lib/store';
 
 function EmbedWidget() {
   const fetchData = useAppStore((state) => state.fetchData);
+  const containerRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
+  useEffect(() => {
+    // Send the height of the widget to the parent window if embedded in an iframe
+    const sendHeightToParent = () => {
+      if (window.parent !== window && containerRef.current) {
+        const height = containerRef.current.offsetHeight;
+        window.parent.postMessage(
+          { type: 'safesailing-widget-height', height }, 
+          '*'
+        );
+      }
+    };
+
+    // Send initial height
+    sendHeightToParent();
+
+    // Setup observer to detect size changes
+    const resizeObserver = new ResizeObserver(() => {
+      sendHeightToParent();
+    });
+
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+
+    return () => {
+      if (containerRef.current) {
+        resizeObserver.disconnect();
+      }
+    };
+  }, []);
+
   return (
-    <div className="embed-widget-container">
+    <div className="embed-widget-container" ref={containerRef}>
       <AlertWidget standalone={true} />
     </div>
   );

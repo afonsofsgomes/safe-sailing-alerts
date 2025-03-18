@@ -12,7 +12,8 @@ import { AlertWidget } from '@/components/AlertWidget';
 
 const EmbedGenerator = () => {
   const { toast } = useToast();
-  const [copied, setCopied] = useState(false);
+  const [copiedIframe, setCopiedIframe] = useState(false);
+  const [copiedScript, setCopiedScript] = useState(false);
   const iframeCodeRef = useRef<HTMLInputElement>(null);
   const scriptCodeRef = useRef<HTMLInputElement>(null);
 
@@ -22,13 +23,18 @@ const EmbedGenerator = () => {
 
   const copyToClipboard = (text: string, type: 'iframe' | 'script') => {
     navigator.clipboard.writeText(text).then(() => {
-      setCopied(true);
+      if (type === 'iframe') {
+        setCopiedIframe(true);
+        setTimeout(() => setCopiedIframe(false), 2000);
+      } else {
+        setCopiedScript(true);
+        setTimeout(() => setCopiedScript(false), 2000);
+      }
+      
       toast({
         title: "Code copied!",
         description: `The ${type} embed code has been copied to your clipboard.`,
       });
-      
-      setTimeout(() => setCopied(false), 2000);
     });
   };
 
@@ -78,7 +84,7 @@ const EmbedGenerator = () => {
                             className="absolute right-4 hover:bg-transparent"
                             onClick={() => copyToClipboard(iframeCode, 'iframe')}
                           >
-                            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                            {copiedIframe ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                           </Button>
                         </div>
                       </div>
@@ -117,7 +123,7 @@ const EmbedGenerator = () => {
                             className="absolute right-4 hover:bg-transparent"
                             onClick={() => copyToClipboard(scriptCode, 'script')}
                           >
-                            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                            {copiedScript ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                           </Button>
                         </div>
                       </div>
@@ -126,9 +132,6 @@ const EmbedGenerator = () => {
                         <p className="text-sm text-muted-foreground">
                           Add this script tag to your website's header or body.
                           The alert will be automatically injected and styled to match your site.
-                        </p>
-                        <p className="text-sm text-amber-600 mt-2">
-                          Note: Script embedding is coming soon. Use the iframe method for now.
                         </p>
                       </div>
                       
