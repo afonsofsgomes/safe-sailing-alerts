@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -10,7 +9,7 @@ import { useAppStore } from '@/lib/store';
 import { AlertCalendar } from '@/components/AlertCalendar';
 import { WidgetSettings } from './WidgetSettings';
 import { Link } from 'react-router-dom';
-import WeatherForecast from '@/components/WeatherForecast';
+import { WeatherForecast } from '@/components/weather';
 
 const Admin = () => {
   const [authModalOpen, setAuthModalOpen] = useState(false);
