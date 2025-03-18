@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -9,7 +10,6 @@ import { useAppStore } from '@/lib/store';
 import { AlertCalendar } from '@/components/AlertCalendar';
 import { WidgetSettings } from './WidgetSettings';
 import { Link } from 'react-router-dom';
-import { WeatherForecast } from '@/components/weather';
 
 const Admin = () => {
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -74,7 +74,6 @@ const Admin = () => {
           <TabsList className="mb-8">
             <TabsTrigger value="calendar">Calendar</TabsTrigger>
             <TabsTrigger value="settings">Widget Settings</TabsTrigger>
-            <TabsTrigger value="weather">Weather Forecast</TabsTrigger>
           </TabsList>
           
           <TabsContent value="calendar" className="space-y-6">
@@ -83,10 +82,6 @@ const Admin = () => {
           
           <TabsContent value="settings" className="space-y-8">
             <WidgetSettings />
-          </TabsContent>
-
-          <TabsContent value="weather" className="space-y-6">
-            <WeatherForecast />
           </TabsContent>
         </Tabs>
       </main>
