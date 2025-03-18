@@ -49,7 +49,7 @@ function EmbedWidget() {
   }, []);
 
   return (
-    <div className="embed-widget-container" ref={containerRef}>
+    <div className="embed-widget-container pb-3" ref={containerRef}>
       <AlertWidget standalone={true} className={isMobile ? "mobile-alert-widget" : ""} />
     </div>
   );
