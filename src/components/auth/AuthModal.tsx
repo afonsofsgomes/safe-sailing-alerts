@@ -25,7 +25,7 @@ export function AuthModal({ isOpen, onClose, defaultView = 'login' }: AuthModalP
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] font-sans">
         {view === 'login' ? (
           <LoginForm 
             onSuccess={handleSuccess} 

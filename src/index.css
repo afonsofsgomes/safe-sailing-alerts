@@ -97,6 +97,7 @@
 }
 
 @layer components {
+  /* ... keep existing code (component styles) */
   .alert-widget {
     @apply relative overflow-hidden;
   }

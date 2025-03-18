@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -20,6 +19,7 @@ export default {
 		},
 		extend: {
 			fontFamily: {
+				// Using only Google Fonts version of Inter, removing references to local files
 				sans: ['Inter', 'system-ui', 'sans-serif'],
 			},
 			colors: {
