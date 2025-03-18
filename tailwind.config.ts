@@ -19,8 +19,8 @@ export default {
 		},
 		extend: {
 			fontFamily: {
-				// Using only Google Fonts version of Inter, removing references to local files
-				sans: ['Inter', 'system-ui', 'sans-serif'],
+				// Using system fonts instead of Inter
+				sans: ['"Segoe UI"', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
 			},
 			colors: {
 				border: 'hsl(var(--border))',
