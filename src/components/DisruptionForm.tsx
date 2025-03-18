@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useAppStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
@@ -18,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { ConfirmationDialog } from './ConfirmationDialog';
 
 interface DisruptionFormProps {
   initialDate?: Date;
@@ -39,9 +39,10 @@ export const DisruptionForm = ({ initialDate, onSuccess }: DisruptionFormProps) 
   const [refundProvided, setRefundProvided] = useState<boolean>(false);
   const [refundAmount, setRefundAmount] = useState<number>(0);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [formValues, setFormValues] = useState<any>(null);
 
+  const validateForm = () => {
     // Basic validation
     if (!startDate) {
       toast({
@@ -49,7 +50,7 @@ export const DisruptionForm = ({ initialDate, onSuccess }: DisruptionFormProps) 
         description: "Please select a start date",
         variant: "destructive",
       });
-      return;
+      return false;
     }
 
     if (isDateRange && (!endDate || endDate < startDate)) {
@@ -58,7 +59,7 @@ export const DisruptionForm = ({ initialDate, onSuccess }: DisruptionFormProps) 
         description: "End date must be after start date",
         variant: "destructive",
       });
-      return;
+      return false;
     }
 
     if (!reason.trim()) {
@@ -67,7 +68,7 @@ export const DisruptionForm = ({ initialDate, onSuccess }: DisruptionFormProps) 
         description: "Please provide a reason for the disruption",
         variant: "destructive",
       });
-      return;
+      return false;
     }
 
     if (!isFullDay && (!startTime || !endTime)) {
@@ -76,7 +77,7 @@ export const DisruptionForm = ({ initialDate, onSuccess }: DisruptionFormProps) 
         description: "Please provide both start and end times",
         variant: "destructive",
       });
-      return;
+      return false;
     }
 
     if (refundProvided && (refundAmount <= 0)) {
@@ -85,25 +86,55 @@ export const DisruptionForm = ({ initialDate, onSuccess }: DisruptionFormProps) 
         description: "Please enter a valid refund amount",
         variant: "destructive",
       });
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
       return;
     }
 
+    // Store form values to be used after confirmation
+    setFormValues({
+      startDate,
+      endDate,
+      startTime,
+      endTime,
+      reason,
+      isFullDay,
+      refundProvided,
+      refundAmount,
+      isDateRange
+    });
+
+    // Open confirmation dialog
+    setConfirmDialogOpen(true);
+  };
+
+  const submitDisruption = async () => {
+    if (!formValues) return;
+
     try {
-      if (isDateRange) {
+      if (formValues.isDateRange) {
         // Calculate days between dates
-        const daysDiff = differenceInDays(endDate, startDate);
+        const daysDiff = differenceInDays(formValues.endDate, formValues.startDate);
         
         // Create a disruption for each day in the range
         for (let i = 0; i <= daysDiff; i++) {
-          const currentDate = addDays(startDate, i);
+          const currentDate = addDays(formValues.startDate, i);
           await addDisruption({
             date: currentDate,
-            startTime: isFullDay ? undefined : startTime,
-            endTime: isFullDay ? undefined : endTime,
-            reason,
-            isFullDay,
-            refundProvided,
-            refundAmount: refundProvided ? refundAmount : undefined
+            startTime: formValues.isFullDay ? undefined : formValues.startTime,
+            endTime: formValues.isFullDay ? undefined : formValues.endTime,
+            reason: formValues.reason,
+            isFullDay: formValues.isFullDay,
+            refundProvided: formValues.refundProvided,
+            refundAmount: formValues.refundProvided ? formValues.refundAmount : undefined
           });
         }
         
@@ -114,13 +145,13 @@ export const DisruptionForm = ({ initialDate, onSuccess }: DisruptionFormProps) 
       } else {
         // Add a single disruption
         await addDisruption({
-          date: startDate,
-          startTime: isFullDay ? undefined : startTime,
-          endTime: isFullDay ? undefined : endTime,
-          reason,
-          isFullDay,
-          refundProvided,
-          refundAmount: refundProvided ? refundAmount : undefined
+          date: formValues.startDate,
+          startTime: formValues.isFullDay ? undefined : formValues.startTime,
+          endTime: formValues.isFullDay ? undefined : formValues.endTime,
+          reason: formValues.reason,
+          isFullDay: formValues.isFullDay,
+          refundProvided: formValues.refundProvided,
+          refundAmount: formValues.refundProvided ? formValues.refundAmount : undefined
         });
         
         toast({
@@ -143,159 +174,172 @@ export const DisruptionForm = ({ initialDate, onSuccess }: DisruptionFormProps) 
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="flex items-center space-x-2 mb-4">
-        <Switch 
-          id="date-range" 
-          checked={isDateRange} 
-          onCheckedChange={setIsDateRange}
-        />
-        <Label htmlFor="date-range">Add a date range</Label>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <InfoIcon className="h-4 w-4 text-gray-400" />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Create multiple alerts for consecutive dates</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
+    <>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="flex items-center space-x-2 mb-4">
+          <Switch 
+            id="date-range" 
+            checked={isDateRange} 
+            onCheckedChange={setIsDateRange}
+          />
+          <Label htmlFor="date-range">Add a date range</Label>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <InfoIcon className="h-4 w-4 text-gray-400" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Create multiple alerts for consecutive dates</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
 
-      {isDateRange ? (
-        <div className="grid grid-cols-2 gap-4">
+        {isDateRange ? (
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="start-date">Start Date</Label>
+              <Input 
+                id="start-date" 
+                type="date" 
+                value={startDate ? format(startDate, 'yyyy-MM-dd') : ''}
+                onChange={(e) => setStartDate(new Date(e.target.value))}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="end-date">End Date</Label>
+              <Input 
+                id="end-date" 
+                type="date" 
+                value={endDate ? format(endDate, 'yyyy-MM-dd') : ''}
+                onChange={(e) => setEndDate(new Date(e.target.value))}
+                min={startDate ? format(startDate, 'yyyy-MM-dd') : ''}
+                required
+              />
+            </div>
+          </div>
+        ) : (
           <div className="space-y-2">
-            <Label htmlFor="start-date">Start Date</Label>
+            <Label htmlFor="date">Date</Label>
             <Input 
-              id="start-date" 
+              id="date" 
               type="date" 
               value={startDate ? format(startDate, 'yyyy-MM-dd') : ''}
               onChange={(e) => setStartDate(new Date(e.target.value))}
               required
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="end-date">End Date</Label>
-            <Input 
-              id="end-date" 
-              type="date" 
-              value={endDate ? format(endDate, 'yyyy-MM-dd') : ''}
-              onChange={(e) => setEndDate(new Date(e.target.value))}
-              min={startDate ? format(startDate, 'yyyy-MM-dd') : ''}
-              required
-            />
-          </div>
+        )}
+
+        <div className="flex items-center space-x-2">
+          <Switch 
+            id="full-day" 
+            checked={isFullDay} 
+            onCheckedChange={setIsFullDay}
+          />
+          <Label htmlFor="full-day">Full day disruption</Label>
         </div>
-      ) : (
+
+        {!isFullDay && (
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="start-time">Start Time</Label>
+              <Input 
+                id="start-time" 
+                type="time" 
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+                required={!isFullDay}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="end-time">End Time</Label>
+              <Input 
+                id="end-time" 
+                type="time" 
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
+                required={!isFullDay}
+              />
+            </div>
+          </div>
+        )}
+
         <div className="space-y-2">
-          <Label htmlFor="date">Date</Label>
-          <Input 
-            id="date" 
-            type="date" 
-            value={startDate ? format(startDate, 'yyyy-MM-dd') : ''}
-            onChange={(e) => setStartDate(new Date(e.target.value))}
+          <Label htmlFor="reason">Reason</Label>
+          <Textarea 
+            id="reason" 
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            placeholder="Describe the reason for the disruption..."
             required
           />
         </div>
-      )}
 
-      <div className="flex items-center space-x-2">
-        <Switch 
-          id="full-day" 
-          checked={isFullDay} 
-          onCheckedChange={setIsFullDay}
-        />
-        <Label htmlFor="full-day">Full day disruption</Label>
-      </div>
-
-      {!isFullDay && (
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="start-time">Start Time</Label>
-            <Input 
-              id="start-time" 
-              type="time" 
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-              required={!isFullDay}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="end-time">End Time</Label>
-            <Input 
-              id="end-time" 
-              type="time" 
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
-              required={!isFullDay}
-            />
-          </div>
+        <div className="flex items-center space-x-2 pt-2">
+          <Switch 
+            id="refund-provided" 
+            checked={refundProvided} 
+            onCheckedChange={setRefundProvided}
+          />
+          <Label htmlFor="refund-provided">Refund needed</Label>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <InfoIcon className="h-4 w-4 text-gray-400" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Check this if refund was needed for this disruption</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
-      )}
 
-      <div className="space-y-2">
-        <Label htmlFor="reason">Reason</Label>
-        <Textarea 
-          id="reason" 
-          value={reason}
-          onChange={(e) => setReason(e.target.value)}
-          placeholder="Describe the reason for the disruption..."
-          required
-        />
-      </div>
-
-      <div className="flex items-center space-x-2 pt-2">
-        <Switch 
-          id="refund-provided" 
-          checked={refundProvided} 
-          onCheckedChange={setRefundProvided}
-        />
-        <Label htmlFor="refund-provided">Refund needed</Label>
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <InfoIcon className="h-4 w-4 text-gray-400" />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Check this if refund was needed for this disruption</p>
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
-
-      {refundProvided && (
-        <div className="space-y-2">
-          <Label htmlFor="refund-amount">Refund Amount (€)</Label>
-          <div className="relative">
-            <Euro className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
-            <Input 
-              id="refund-amount" 
-              type="number" 
-              min="0" 
-              step="0.01"
-              className="pl-10"
-              value={refundAmount}
-              onChange={(e) => setRefundAmount(parseFloat(e.target.value))}
-              required={refundProvided}
-            />
+        {refundProvided && (
+          <div className="space-y-2">
+            <Label htmlFor="refund-amount">Refund Amount (€)</Label>
+            <div className="relative">
+              <Euro className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
+              <Input 
+                id="refund-amount" 
+                type="number" 
+                min="0" 
+                step="0.01"
+                className="pl-10"
+                value={refundAmount}
+                onChange={(e) => setRefundAmount(parseFloat(e.target.value))}
+                required={refundProvided}
+              />
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      <DialogFooter>
-        <Button type="submit" className="w-full sm:w-auto" disabled={loading}>
-          {loading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Saving...
-            </>
-          ) : (
-            'Save Disruption'
-          )}
-        </Button>
-      </DialogFooter>
-    </form>
+        <DialogFooter>
+          <Button type="submit" className="w-full sm:w-auto" disabled={loading}>
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              'Save Disruption'
+            )}
+          </Button>
+        </DialogFooter>
+      </form>
+
+      <ConfirmationDialog
+        isOpen={confirmDialogOpen}
+        onClose={() => setConfirmDialogOpen(false)}
+        onConfirm={submitDisruption}
+        title="Confirm Disruption"
+        description="Have you already applied this disruption in the Bokun system? This information will be publicly visible in the widget immediately after confirmation."
+        confirmText="Yes, Publish Disruption"
+        cancelText="Cancel"
+        variant="warning"
+      />
+    </>
   );
 };
 

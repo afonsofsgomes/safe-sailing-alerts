@@ -18,11 +18,14 @@ import {
 import { DisruptionForm } from './DisruptionForm';
 import { useAuth } from '@/lib/auth';
 import { AuthModal } from './auth/AuthModal';
+import { ConfirmationDialog } from './ConfirmationDialog';
 
 export const AlertCalendar = () => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [disruptionToDelete, setDisruptionToDelete] = useState<string | null>(null);
   const { user } = useAuth();
   
   const disruptions = useAppStore((state) => state.disruptions);
@@ -69,8 +72,15 @@ export const AlertCalendar = () => {
   };
 
   const handleDeleteDisruption = async (id: string) => {
+    setDisruptionToDelete(id);
+    setDeleteConfirmOpen(true);
+  };
+
+  const confirmDeleteDisruption = async () => {
+    if (!disruptionToDelete) return;
+    
     try {
-      await removeDisruption(id);
+      await removeDisruption(disruptionToDelete);
     } catch (error) {
       console.error("Failed to delete disruption:", error);
     }
@@ -177,6 +187,17 @@ export const AlertCalendar = () => {
           ))}
         </div>
       </div>
+      
+      <ConfirmationDialog
+        isOpen={deleteConfirmOpen}
+        onClose={() => setDeleteConfirmOpen(false)}
+        onConfirm={confirmDeleteDisruption}
+        title="Delete Disruption"
+        description="Are you sure you want to delete this disruption? This action cannot be undone and will immediately remove the information from the public widget."
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="delete"
+      />
       
       <AuthModal 
         isOpen={authModalOpen} 
