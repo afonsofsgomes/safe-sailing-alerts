@@ -91,8 +91,6 @@ export const AlertCalendar = () => {
         disruptions={disruptions}
         onAddDisruption={handleAddDisruption}
         hasDisruption={hasDisruption}
-        isDialogOpen={isDialogOpen}
-        setIsDialogOpen={setIsDialogOpen}
       />
 
       <DisruptionsList
@@ -102,14 +100,14 @@ export const AlertCalendar = () => {
         loading={loading}
       />
       
-      {isDialogOpen && (
-        <DisruptionDialogContent
-          selectedDate={selectedDate}
-          onSuccess={() => {
-            setIsDialogOpen(false);
-          }}
-        />
-      )}
+      <DisruptionDialogContent
+        isOpen={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        selectedDate={selectedDate}
+        onSuccess={() => {
+          setIsDialogOpen(false);
+        }}
+      />
       
       <ConfirmationDialog
         isOpen={deleteConfirmOpen}

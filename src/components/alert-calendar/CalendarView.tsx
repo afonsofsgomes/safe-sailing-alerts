@@ -1,8 +1,6 @@
 
-import { useState } from 'react';
 import { Calendar } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 import { useAuth } from '@/lib/auth';
 import { Disruption } from '@/lib/types';
 
@@ -12,8 +10,6 @@ interface CalendarViewProps {
   disruptions: Disruption[];
   onAddDisruption: () => void;
   hasDisruption: (date: Date) => boolean;
-  isDialogOpen: boolean;
-  setIsDialogOpen: (isOpen: boolean) => void;
 }
 
 export const CalendarView = ({
@@ -21,9 +17,7 @@ export const CalendarView = ({
   setSelectedDate,
   disruptions,
   onAddDisruption,
-  hasDisruption,
-  isDialogOpen,
-  setIsDialogOpen
+  hasDisruption
 }: CalendarViewProps) => {
   const { user } = useAuth();
 
@@ -43,16 +37,12 @@ export const CalendarView = ({
       />
       
       <div className="mt-4 flex flex-wrap gap-2">
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button 
-              className="flex items-center gap-2 bg-sea-500 hover:bg-sea-600 transition-colors"
-              onClick={onAddDisruption}
-            >
-              Add Disruption
-            </Button>
-          </DialogTrigger>
-        </Dialog>
+        <Button 
+          className="flex items-center gap-2 bg-sea-500 hover:bg-sea-600 transition-colors"
+          onClick={onAddDisruption}
+        >
+          Add Disruption
+        </Button>
       </div>
     </div>
   );
