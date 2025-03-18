@@ -31,10 +31,14 @@ export const WeatherForecast = () => {
     setError(null);
     
     try {
+      console.log("Fetching data for location:", location.name);
       const [marine, weather] = await Promise.all([
         fetchMarineWeather(location.latitude, location.longitude),
         fetchWeatherData(location.latitude, location.longitude)
       ]);
+      
+      console.log("Marine data received:", marine);
+      console.log("Weather data received:", weather);
       
       setMarineData(marine);
       setWeatherData(weather);

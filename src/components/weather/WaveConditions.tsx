@@ -14,12 +14,12 @@ interface WaveConditionsProps {
 
 export const WaveConditions = ({ marineData, selectedDate }: WaveConditionsProps) => {
   const getWaveData = () => {
-    const dailyData = marineData.time
+    const dailyData = marineData.hourly.time
       .map((time, index) => ({
         time,
         date: time.split('T')[0],
-        wave_height: marineData.wave_height[index],
-        wave_period: marineData.wave_period[index],
+        wave_height: marineData.hourly.wave_height[index],
+        wave_period: marineData.hourly.wave_period[index],
       }))
       .filter(item => item.date === selectedDate);
     
@@ -31,8 +31,8 @@ export const WaveConditions = ({ marineData, selectedDate }: WaveConditionsProps
   };
 
   const timeAverages = getMorningEveningAverages(
-    marineData.time,
-    marineData.wave_height,
+    marineData.hourly.time,
+    marineData.hourly.wave_height,
     selectedDate
   );
 
@@ -52,8 +52,8 @@ export const WaveConditions = ({ marineData, selectedDate }: WaveConditionsProps
               <span className="text-2xl font-bold">
                 {formatValueWithUnit(
                   getDailyAverageFromHourly(
-                    marineData.time, 
-                    marineData.wave_height, 
+                    marineData.hourly.time, 
+                    marineData.hourly.wave_height, 
                     selectedDate
                   ),
                   'm'
@@ -65,8 +65,8 @@ export const WaveConditions = ({ marineData, selectedDate }: WaveConditionsProps
               <span className="text-2xl font-bold">
                 {formatValueWithUnit(
                   getDailyAverageFromHourly(
-                    marineData.time, 
-                    marineData.wave_period, 
+                    marineData.hourly.time, 
+                    marineData.hourly.wave_period, 
                     selectedDate
                   ),
                   's'
@@ -78,8 +78,8 @@ export const WaveConditions = ({ marineData, selectedDate }: WaveConditionsProps
               <span className="text-2xl font-bold">
                 {degreesToCardinal(
                   getDailyAverageFromHourly(
-                    marineData.time, 
-                    marineData.wave_direction, 
+                    marineData.hourly.time, 
+                    marineData.hourly.wave_direction, 
                     selectedDate
                   )
                 )}

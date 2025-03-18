@@ -14,12 +14,12 @@ interface WindConditionsProps {
 
 export const WindConditions = ({ marineData, selectedDate }: WindConditionsProps) => {
   const getWindData = () => {
-    const dailyData = marineData.time
+    const dailyData = marineData.hourly.time
       .map((time, index) => ({
         time,
         date: time.split('T')[0],
-        wind_speed: marineData.wind_speed_10m[index],
-        wind_direction: marineData.wind_direction_10m[index],
+        wind_speed: marineData.hourly.wind_speed_10m[index],
+        wind_direction: marineData.hourly.wind_direction_10m[index],
       }))
       .filter(item => item.date === selectedDate);
     
@@ -31,8 +31,8 @@ export const WindConditions = ({ marineData, selectedDate }: WindConditionsProps
   };
 
   const timeAverages = getMorningEveningAverages(
-    marineData.time,
-    marineData.wind_speed_10m,
+    marineData.hourly.time,
+    marineData.hourly.wind_speed_10m,
     selectedDate
   );
 
@@ -52,8 +52,8 @@ export const WindConditions = ({ marineData, selectedDate }: WindConditionsProps
               <span className="text-2xl font-bold">
                 {formatValueWithUnit(
                   getDailyAverageFromHourly(
-                    marineData.time, 
-                    marineData.wind_speed_10m, 
+                    marineData.hourly.time, 
+                    marineData.hourly.wind_speed_10m, 
                     selectedDate
                   ),
                   'km/h'
@@ -65,8 +65,8 @@ export const WindConditions = ({ marineData, selectedDate }: WindConditionsProps
               <span className="text-2xl font-bold">
                 {degreesToCardinal(
                   getDailyAverageFromHourly(
-                    marineData.time, 
-                    marineData.wind_direction_10m, 
+                    marineData.hourly.time, 
+                    marineData.hourly.wind_direction_10m, 
                     selectedDate
                   )
                 )}
