@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth';
 import { AuthModal } from '@/components/auth/AuthModal';
 import { useAppStore } from '@/lib/store';
-import { AlertCalendar } from '@/components/AlertCalendar';
+import { AlertCalendar } from '@/components/alert-calendar';
 import { WidgetSettings } from './WidgetSettings';
 import { Link } from 'react-router-dom';
 
