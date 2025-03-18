@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { formatDisruptionDate, formatDisruptionTime, getActiveDisruptions, useAppStore } from '@/lib/store';
 import { AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface AlertWidgetProps {
   className?: string;
@@ -13,6 +14,7 @@ export const AlertWidget = ({ className, standalone = false }: AlertWidgetProps)
   const activeDisruptions = getActiveDisruptions();
   const widgetSettings = useAppStore((state) => state.widgetSettings);
   const [mounted, setMounted] = useState(false);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     setMounted(true);
@@ -75,6 +77,18 @@ export const AlertWidget = ({ className, standalone = false }: AlertWidgetProps)
   };
 
   const getLayoutClasses = () => {
+    // Adjust padding for mobile devices
+    if (isMobile) {
+      switch (widgetSettings.layout) {
+        case 'compact':
+          return 'p-2';
+        case 'minimal':
+          return 'p-1.5';
+        default:
+          return 'p-3';
+      }
+    }
+    
     switch (widgetSettings.layout) {
       case 'compact':
         return 'p-3';
@@ -108,7 +122,8 @@ export const AlertWidget = ({ className, standalone = false }: AlertWidgetProps)
         getLayoutClasses(),
         getAnimationClass(),
         'text-white',
-        standalone ? 'max-w-lg mx-auto my-4' : '',
+        isMobile ? 'text-sm' : '',
+        standalone ? (isMobile ? 'w-full mx-auto my-2' : 'max-w-lg mx-auto my-4') : '',
         className
       )}
       style={{ 
@@ -117,27 +132,27 @@ export const AlertWidget = ({ className, standalone = false }: AlertWidgetProps)
       }}
     >
       <div className="relative z-10">
-        <div className="flex items-start gap-3">
+        <div className={`flex items-start ${isMobile ? 'gap-2' : 'gap-3'}`}>
           {widgetSettings.showIcon && (
-            <AlertTriangle className="h-5 w-5 mt-0.5 flex-shrink-0" 
+            <AlertTriangle className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'} mt-0.5 flex-shrink-0`} 
               style={{ color: widgetSettings.accentColor }} />
           )}
           <div>
-            <h3 className="font-semibold text-lg">
+            <h3 className={`font-semibold ${isMobile ? 'text-base' : 'text-lg'}`}>
               {widgetSettings.title}
             </h3>
-            <p className="text-sm mt-1 opacity-90">
+            <p className={`${isMobile ? 'text-xs' : 'text-sm'} mt-1 opacity-90`}>
               {widgetSettings.description}
             </p>
             
             {widgetSettings.showDates && (
-              <p className="font-medium mt-2">
+              <p className={`font-medium ${isMobile ? 'mt-1.5 text-xs' : 'mt-2'}`}>
                 {formatDates()}
               </p>
             )}
 
             {widgetSettings.showTimes && (
-              <div className="mt-2 text-sm space-y-1">
+              <div className={`${isMobile ? 'mt-1.5 text-xs' : 'mt-2 text-sm'} space-y-1`}>
                 {activeDisruptions.map(disruption => (
                   <div key={disruption.id} className="flex items-center gap-2">
                     <span className="font-medium">

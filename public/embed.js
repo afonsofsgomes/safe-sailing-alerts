@@ -9,6 +9,7 @@
     container.style.margin = '0';
     container.style.padding = '0';
     container.style.overflow = 'hidden';
+    container.style.boxSizing = 'border-box';
     
     // Create iframe for the widget
     const iframe = document.createElement('iframe');
@@ -18,10 +19,12 @@
     iframe.style.width = '100%';
     iframe.style.border = 'none';
     iframe.style.overflow = 'hidden';
+    iframe.style.display = 'block'; // Ensure the iframe is a block element
     iframe.scrolling = 'no';
     iframe.allowFullscreen = false;
+    iframe.title = 'SafeSailing Alert Widget';
     
-    // Add event listener to receive height from the iframe
+    // Add event listener to receive height from the iframe and handle resize
     window.addEventListener('message', (event) => {
       // Only accept messages from our own origin
       if (event.origin !== iframe.src.split('/').slice(0, 3).join('/')) return;
@@ -29,6 +32,18 @@
       if (event.data && event.data.type === 'safesailing-widget-height') {
         iframe.style.height = event.data.height + 'px';
       }
+    });
+    
+    // Handle window resize for responsive behavior
+    window.addEventListener('resize', () => {
+      // Force recalculation of iframe size after resize
+      setTimeout(() => {
+        const message = {
+          type: 'safesailing-widget-resize',
+          width: container.offsetWidth
+        };
+        iframe.contentWindow?.postMessage(message, '*');
+      }, 100);
     });
     
     container.appendChild(iframe);

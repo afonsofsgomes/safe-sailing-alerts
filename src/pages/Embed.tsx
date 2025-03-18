@@ -2,10 +2,12 @@
 import { useEffect, useRef } from 'react';
 import { AlertWidget } from '@/components/AlertWidget';
 import { useAppStore } from '@/lib/store';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 function EmbedWidget() {
   const fetchData = useAppStore((state) => state.fetchData);
   const containerRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
   
   useEffect(() => {
     fetchData();
@@ -35,16 +37,20 @@ function EmbedWidget() {
       resizeObserver.observe(containerRef.current);
     }
 
+    // Also listen for window resize events for better mobile support
+    window.addEventListener('resize', sendHeightToParent);
+
     return () => {
       if (containerRef.current) {
         resizeObserver.disconnect();
       }
+      window.removeEventListener('resize', sendHeightToParent);
     };
   }, []);
 
   return (
     <div className="embed-widget-container" ref={containerRef}>
-      <AlertWidget standalone={true} />
+      <AlertWidget standalone={true} className={isMobile ? "mobile-alert-widget" : ""} />
     </div>
   );
 }
