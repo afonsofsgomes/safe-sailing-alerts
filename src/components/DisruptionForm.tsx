@@ -1,23 +1,17 @@
+
 import { useState } from 'react';
 import { useAppStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { DialogFooter } from '@/components/ui/dialog';
-import { Loader2, InfoIcon, Euro } from 'lucide-react';
-import { format, addDays, differenceInDays } from 'date-fns';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Loader2 } from 'lucide-react';
+import { addDays, differenceInDays } from 'date-fns';
 import { ConfirmationDialog } from './ConfirmationDialog';
+import { DateSelectionSection } from './disruption-form/DateSelectionSection';
+import { TimeSelectionSection } from './disruption-form/TimeSelectionSection';
+import { RefundSection } from './disruption-form/RefundSection';
 
 interface DisruptionFormProps {
   initialDate?: Date;
@@ -176,95 +170,23 @@ export const DisruptionForm = ({ initialDate, onSuccess }: DisruptionFormProps) 
   return (
     <>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="flex items-center space-x-2 mb-4">
-          <Switch 
-            id="date-range" 
-            checked={isDateRange} 
-            onCheckedChange={setIsDateRange}
-          />
-          <Label htmlFor="date-range">Add a date range</Label>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <InfoIcon className="h-4 w-4 text-gray-400" />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Create multiple alerts for consecutive dates</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
+        <DateSelectionSection
+          isDateRange={isDateRange}
+          setIsDateRange={setIsDateRange}
+          startDate={startDate}
+          setStartDate={setStartDate}
+          endDate={endDate}
+          setEndDate={setEndDate}
+        />
 
-        {isDateRange ? (
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="start-date">Start Date</Label>
-              <Input 
-                id="start-date" 
-                type="date" 
-                value={startDate ? format(startDate, 'yyyy-MM-dd') : ''}
-                onChange={(e) => setStartDate(new Date(e.target.value))}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="end-date">End Date</Label>
-              <Input 
-                id="end-date" 
-                type="date" 
-                value={endDate ? format(endDate, 'yyyy-MM-dd') : ''}
-                onChange={(e) => setEndDate(new Date(e.target.value))}
-                min={startDate ? format(startDate, 'yyyy-MM-dd') : ''}
-                required
-              />
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            <Label htmlFor="date">Date</Label>
-            <Input 
-              id="date" 
-              type="date" 
-              value={startDate ? format(startDate, 'yyyy-MM-dd') : ''}
-              onChange={(e) => setStartDate(new Date(e.target.value))}
-              required
-            />
-          </div>
-        )}
-
-        <div className="flex items-center space-x-2">
-          <Switch 
-            id="full-day" 
-            checked={isFullDay} 
-            onCheckedChange={setIsFullDay}
-          />
-          <Label htmlFor="full-day">Full day disruption</Label>
-        </div>
-
-        {!isFullDay && (
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="start-time">Start Time</Label>
-              <Input 
-                id="start-time" 
-                type="time" 
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-                required={!isFullDay}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="end-time">End Time</Label>
-              <Input 
-                id="end-time" 
-                type="time" 
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-                required={!isFullDay}
-              />
-            </div>
-          </div>
-        )}
+        <TimeSelectionSection
+          isFullDay={isFullDay}
+          setIsFullDay={setIsFullDay}
+          startTime={startTime}
+          setStartTime={setStartTime}
+          endTime={endTime}
+          setEndTime={setEndTime}
+        />
 
         <div className="space-y-2">
           <Label htmlFor="reason">Reason</Label>
@@ -277,43 +199,12 @@ export const DisruptionForm = ({ initialDate, onSuccess }: DisruptionFormProps) 
           />
         </div>
 
-        <div className="flex items-center space-x-2 pt-2">
-          <Switch 
-            id="refund-provided" 
-            checked={refundProvided} 
-            onCheckedChange={setRefundProvided}
-          />
-          <Label htmlFor="refund-provided">Refund needed</Label>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <InfoIcon className="h-4 w-4 text-gray-400" />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Check this if refund was needed for this disruption</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-
-        {refundProvided && (
-          <div className="space-y-2">
-            <Label htmlFor="refund-amount">Refund Amount (€)</Label>
-            <div className="relative">
-              <Euro className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
-              <Input 
-                id="refund-amount" 
-                type="number" 
-                min="0" 
-                step="0.01"
-                className="pl-10"
-                value={refundAmount}
-                onChange={(e) => setRefundAmount(parseFloat(e.target.value))}
-                required={refundProvided}
-              />
-            </div>
-          </div>
-        )}
+        <RefundSection
+          refundProvided={refundProvided}
+          setRefundProvided={setRefundProvided}
+          refundAmount={refundAmount}
+          setRefundAmount={setRefundAmount}
+        />
 
         <DialogFooter>
           <Button type="submit" className="w-full sm:w-auto" disabled={loading}>
