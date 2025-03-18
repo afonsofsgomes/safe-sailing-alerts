@@ -12,8 +12,8 @@ export const locations: WeatherLocation[] = [
 
 // Function to fetch marine weather data from Open-Meteo marine API
 export const fetchMarineWeather = async (latitude: number, longitude: number): Promise<MarineWeatherData> => {
-  // Updated API endpoint with correct parameter format
-  const url = `https://marine-api.open-meteo.com/v1/marine?latitude=${latitude}&longitude=${longitude}&hourly=wave_height,wave_direction,wave_period,wind_wave_height,wind_wave_direction,wind_wave_period,wind_speed_10m,wind_direction_10m,precipitation&forecast_days=6`;
+  // Updated API endpoint with correct parameters
+  const url = `https://marine-api.open-meteo.com/v1/marine?latitude=${latitude}&longitude=${longitude}&hourly=wave_height,wave_direction,wave_period,wind_speed_10m,wind_direction_10m&forecast_days=6`;
   
   try {
     const response = await fetch(url);
@@ -92,4 +92,31 @@ export const getDailyAverageFromHourly = (hourlyTimes: string[], hourlyValues: n
   
   const sum = dateValues.reduce((acc, val) => acc + val, 0);
   return sum / dateValues.length;
+};
+
+// New function to get morning and evening averages
+export const getMorningEveningAverages = (hourlyTimes: string[], hourlyValues: number[], targetDate: string): { morning: number, evening: number } => {
+  const morningValues: number[] = [];
+  const eveningValues: number[] = [];
+  
+  hourlyTimes.forEach((time, index) => {
+    if (time.startsWith(targetDate)) {
+      const hour = new Date(time).getHours();
+      if (hour >= 6 && hour < 12) {
+        morningValues.push(hourlyValues[index]);
+      } else if (hour >= 18 && hour < 24) {
+        eveningValues.push(hourlyValues[index]);
+      }
+    }
+  });
+  
+  const morningAvg = morningValues.length > 0 
+    ? morningValues.reduce((acc, val) => acc + val, 0) / morningValues.length 
+    : 0;
+    
+  const eveningAvg = eveningValues.length > 0 
+    ? eveningValues.reduce((acc, val) => acc + val, 0) / eveningValues.length 
+    : 0;
+    
+  return { morning: morningAvg, evening: eveningAvg };
 };

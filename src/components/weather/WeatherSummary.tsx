@@ -1,9 +1,14 @@
 
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Compass, Waves, Wind, Droplets, Gauge } from 'lucide-react';
+import { Compass, Waves, Wind, Droplets, Gauge, Sun, Moon } from 'lucide-react';
 import { WeatherLocation, MarineWeatherData, WeatherData } from '@/lib/types';
-import { formatValueWithUnit, degreesToCardinal, getDailyAverageFromHourly } from '@/lib/weatherService';
+import { 
+  formatValueWithUnit, 
+  degreesToCardinal, 
+  getDailyAverageFromHourly,
+  getMorningEveningAverages
+} from '@/lib/weatherService';
 
 interface WeatherSummaryProps {
   selectedLocation: WeatherLocation;
@@ -33,6 +38,18 @@ export const WeatherSummary = ({
     
     return weatherData.daily.precipitation_sum[precipIndex];
   };
+
+  const waveHeightTimes = getMorningEveningAverages(
+    marineData.time,
+    marineData.wave_height,
+    selectedDate
+  );
+  
+  const windSpeedTimes = getMorningEveningAverages(
+    marineData.time,
+    marineData.wind_speed_10m,
+    selectedDate
+  );
 
   return (
     <Card>
@@ -118,6 +135,53 @@ export const WeatherSummary = ({
                   'hPa'
                 )}
               </span>
+            </div>
+          </div>
+          
+          <div className="mt-4 border-t pt-4">
+            <h4 className="text-sm font-medium mb-2">Morning & Evening Averages</h4>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-sky-50 p-3 rounded-md">
+                <div className="flex items-center gap-2 mb-2">
+                  <Sun className="h-4 w-4 text-amber-500" />
+                  <span className="text-sm font-medium">Morning</span>
+                </div>
+                <div className="grid grid-cols-1 gap-2">
+                  <div className="flex justify-between">
+                    <span className="text-xs">Wave Height:</span>
+                    <span className="text-xs font-medium">
+                      {formatValueWithUnit(waveHeightTimes.morning, 'm')}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-xs">Wind Speed:</span>
+                    <span className="text-xs font-medium">
+                      {formatValueWithUnit(windSpeedTimes.morning, 'km/h')}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-indigo-50 p-3 rounded-md">
+                <div className="flex items-center gap-2 mb-2">
+                  <Moon className="h-4 w-4 text-indigo-500" />
+                  <span className="text-sm font-medium">Evening</span>
+                </div>
+                <div className="grid grid-cols-1 gap-2">
+                  <div className="flex justify-between">
+                    <span className="text-xs">Wave Height:</span>
+                    <span className="text-xs font-medium">
+                      {formatValueWithUnit(waveHeightTimes.evening, 'm')}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-xs">Wind Speed:</span>
+                    <span className="text-xs font-medium">
+                      {formatValueWithUnit(windSpeedTimes.evening, 'km/h')}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

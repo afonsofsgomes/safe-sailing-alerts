@@ -1,9 +1,9 @@
 
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Waves } from 'lucide-react';
+import { Waves, Sun, Moon } from 'lucide-react';
 import { MarineWeatherData } from '@/lib/types';
-import { formatValueWithUnit, degreesToCardinal, getDailyAverageFromHourly } from '@/lib/weatherService';
+import { formatValueWithUnit, degreesToCardinal, getDailyAverageFromHourly, getMorningEveningAverages } from '@/lib/weatherService';
 import { ChartContainer, ChartLegendContent, ChartTooltipContent, ChartTooltip } from '@/components/ui/chart';
 import { Legend, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from 'recharts';
 
@@ -29,6 +29,12 @@ export const WaveConditions = ({ marineData, selectedDate }: WaveConditionsProps
       'Wave Period': item.wave_period,
     }));
   };
+
+  const timeAverages = getMorningEveningAverages(
+    marineData.time,
+    marineData.wave_height,
+    selectedDate
+  );
 
   return (
     <Card>
@@ -77,6 +83,27 @@ export const WaveConditions = ({ marineData, selectedDate }: WaveConditionsProps
                     selectedDate
                   )
                 )}
+              </span>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4 py-2 border-t border-b my-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1">
+                <Sun className="h-4 w-4 text-amber-500" />
+                <span className="text-xs font-medium">Morning</span>
+              </div>
+              <span className="text-sm font-medium">
+                {formatValueWithUnit(timeAverages.morning, 'm')}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1">
+                <Moon className="h-4 w-4 text-indigo-500" />
+                <span className="text-xs font-medium">Evening</span>
+              </div>
+              <span className="text-sm font-medium">
+                {formatValueWithUnit(timeAverages.evening, 'm')}
               </span>
             </div>
           </div>

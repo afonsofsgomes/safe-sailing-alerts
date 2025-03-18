@@ -42,8 +42,7 @@ export interface MarineWeatherData {
   wave_direction: number[];
   wind_speed_10m: number[];
   wind_direction_10m: number[];
-  precipitation: number[];
-  // Removed pressure_msl as it's not available in the marine hourly endpoint
+  // Removed precipitation as it's causing the API error
 }
 
 export interface WeatherData {
