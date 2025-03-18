@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { 
   locations, 
@@ -12,7 +11,7 @@ import {
 import { MarineWeatherData, WeatherData, WeatherLocation } from '@/lib/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Wave, Wind, Droplets, Compass, Gauge } from 'lucide-react';
+import { Loader2, Waves, Wind, Droplets, Compass, Gauge } from 'lucide-react';
 import { ChartContainer, ChartLegendContent, ChartTooltipContent, ChartTooltip } from '@/components/ui/chart';
 import { Legend, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from 'recharts';
 
@@ -159,7 +158,7 @@ export const WeatherForecast = () => {
                   <Card>
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
-                        <Wave className="h-5 w-5 text-blue-500" />
+                        <Waves className="h-5 w-5 text-blue-500" />
                         Wave Conditions
                       </CardTitle>
                     </CardHeader>
@@ -385,7 +384,7 @@ export const WeatherForecast = () => {
                           
                           <div className="flex items-center space-x-4 pt-2">
                             <div className="flex items-center gap-1 text-sm">
-                              <Wave className="h-4 w-4 text-blue-500" />
+                              <Waves className="h-4 w-4 text-blue-500" />
                               <span>
                                 {formatValueWithUnit(
                                   getDailyAverageFromHourly(
