@@ -1,23 +1,18 @@
-
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Disruption, WidgetSettings, SocialMediaSettings } from './types';
+import { Disruption, WidgetSettings } from './types';
 import { 
   fetchDisruptions, 
   createDisruption, 
   updateDisruption as updateDisruptionService, 
   deleteDisruption as deleteDisruptionService,
   fetchWidgetSettings,
-  updateWidgetSettings as updateWidgetSettingsService,
-  fetchSocialMediaSettings,
-  updateSocialMediaSettings as updateSocialMediaSettingsService,
-  manualPostToSocial
+  updateWidgetSettings as updateWidgetSettingsService
 } from './services';
 
 interface AppState {
   disruptions: Disruption[];
   widgetSettings: WidgetSettings;
-  socialMediaSettings: SocialMediaSettings | null;
   loading: boolean;
   error: string | null;
   // Actions
@@ -26,8 +21,6 @@ interface AppState {
   removeDisruption: (id: string) => Promise<void>;
   updateDisruption: (id: string, disruption: Partial<Disruption>) => Promise<void>;
   updateWidgetSettings: (settings: Partial<WidgetSettings>) => Promise<void>;
-  updateSocialMediaSettings: (settings: Partial<SocialMediaSettings>) => Promise<void>;
-  postDisruptionToSocial: (id: string) => Promise<void>;
 }
 
 export const useAppStore = create<AppState>()(
@@ -49,23 +42,20 @@ export const useAppStore = create<AppState>()(
         layout: 'standard',
         borderWidth: 'thin'
       },
-      socialMediaSettings: null,
       loading: false,
       error: null,
       
       fetchData: async () => {
         try {
           set({ loading: true, error: null });
-          const [disruptions, widgetSettings, socialSettings] = await Promise.all([
+          const [disruptions, settings] = await Promise.all([
             fetchDisruptions(),
-            fetchWidgetSettings(),
-            fetchSocialMediaSettings()
+            fetchWidgetSettings()
           ]);
           
           set({
             disruptions,
-            widgetSettings: widgetSettings || get().widgetSettings,
-            socialMediaSettings: socialSettings,
+            widgetSettings: settings || get().widgetSettings,
             loading: false
           });
         } catch (error: any) {
@@ -150,41 +140,6 @@ export const useAppStore = create<AppState>()(
           throw error;
         }
       },
-      
-      updateSocialMediaSettings: async (settings) => {
-        try {
-          set({ loading: true, error: null });
-          await updateSocialMediaSettingsService(settings);
-          set(state => ({
-            socialMediaSettings: state.socialMediaSettings 
-              ? { ...state.socialMediaSettings, ...settings }
-              : settings as SocialMediaSettings,
-            loading: false
-          }));
-        } catch (error: any) {
-          console.error('Error updating social media settings:', error);
-          set({
-            loading: false,
-            error: error.message || 'Failed to update social media settings'
-          });
-          throw error;
-        }
-      },
-      
-      postDisruptionToSocial: async (id) => {
-        try {
-          set({ loading: true, error: null });
-          await manualPostToSocial(id);
-          set({ loading: false });
-        } catch (error: any) {
-          console.error('Error posting to social media:', error);
-          set({
-            loading: false,
-            error: error.message || 'Failed to post to social media'
-          });
-          throw error;
-        }
-      }
     }),
     {
       name: 'boat-tour-alerts-storage',

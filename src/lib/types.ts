@@ -27,29 +27,3 @@ export interface WidgetSettings {
   layout: 'standard' | 'compact' | 'minimal';
   borderWidth: 'none' | 'thin' | 'medium' | 'thick';
 }
-
-export interface SocialMediaSettings {
-  id: string;
-  enabled: boolean;
-  platforms: {
-    facebook: {
-      enabled: boolean;
-      pageId?: string;
-      pageName?: string;
-    };
-    instagram: {
-      enabled: boolean;
-      accountId?: string;
-      username?: string;
-    };
-  };
-  postSettings: {
-    includeImage: boolean;
-    message: string;
-    hashtags: string[];
-    autoPost: boolean;
-  };
-  userId: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
