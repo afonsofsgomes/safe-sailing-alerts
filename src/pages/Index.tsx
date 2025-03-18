@@ -1,124 +1,104 @@
 
-import { AlertWidget } from "@/components/AlertWidget";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { Sailboat, CloudSun, AlertTriangle, Code } from "lucide-react";
-import { Header } from "@/components/Header";
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { AlertCircle, Waves, Calendar, BarChart2, ShieldCheck } from 'lucide-react';
+import { AlertWidget } from '@/components/AlertWidget';
+import { Header } from '@/components/Header';
+import { WeatherForecast } from '@/components/WeatherForecast';
 
-const Index = () => {
+export const Index = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-sky-50 to-white">
+    <div className="min-h-screen bg-gray-50">
       <Header />
       
-      <main className="flex-1 pt-24">
-        {/* Hero Section */}
-        <section className="relative px-6 pt-20 pb-24 sm:pt-32 lg:px-8 overflow-hidden">
-          <div className="absolute inset-0 -z-10 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-b from-sky-50 to-white" />
-            
-            <div className="absolute -top-40 -right-20 h-[500px] w-[500px] rounded-full bg-sea-100 blur-3xl opacity-20" />
-            <div className="absolute -bottom-40 -left-20 h-[500px] w-[500px] rounded-full bg-sea-200 blur-3xl opacity-20" />
+      <main className="container mx-auto px-4 py-8 pt-24">
+        <div className="max-w-6xl mx-auto space-y-8">
+          <div className="text-center space-y-4 mb-8">
+            <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl">
+              Safe Sailing Weather Alerts
+            </h1>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Stay informed about weather conditions that may affect your boating trips
+            </p>
           </div>
           
-          <div className="mx-auto max-w-2xl text-center">
-            <div className="flex justify-center mb-6">
-              <div className="bg-white/50 backdrop-blur-sm p-3 rounded-full shadow-sm animate-float">
-                <Sailboat className="h-12 w-12 text-sea-500" />
-              </div>
-            </div>
-            
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl animate-slide-up">
-              Keep Your Customers Informed
-            </h1>
-            <p className="mt-6 text-lg leading-8 text-gray-600 animate-slide-up">
-              Easily manage and display weather-related disruptions to your boat tours with our simple alert system.
-            </p>
-            <div className="mt-10 flex items-center justify-center gap-x-6 animate-slide-up">
-              <Button asChild size="lg" className="bg-sea-500 hover:bg-sea-600">
-                <Link to="/admin">
-                  Manage Alerts
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg">
-                <Link to="/embed">
-                  Embed Widget
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </section>
-
-        {/* Alert Widget Preview */}
-        <section className="py-12 px-6">
-          <div className="max-w-4xl mx-auto animate-fade-in">
-            <AlertWidget standalone={true} />
-          </div>
-        </section>
-        
-        {/* Features */}
-        <section className="py-24 px-6 bg-white">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
-                Simple, Effective Weather Alerts
+          <AlertWidget standalone={true} />
+          
+          <div className="mt-12">
+            <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+              <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                <Waves className="h-6 w-6 text-blue-500" />
+                Marine Weather Forecast
               </h2>
-              <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
-                Keep your customers informed about weather-related disruptions to your sailing schedule.
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <FeatureCard 
-                icon={<CloudSun className="h-10 w-10 text-sea-500" />}
-                title="Weather Disruptions"
-                description="Easily mark days or time periods when your boat tours won't be operating due to weather conditions."
-              />
-              <FeatureCard 
-                icon={<AlertTriangle className="h-10 w-10 text-amber-500" />}
-                title="Clear Alerts"
-                description="Display beautiful, attention-grabbing alerts on your website to keep customers informed."
-              />
-              <FeatureCard 
-                icon={<Code className="h-10 w-10 text-gray-700" />}
-                title="Simple Integration"
-                description="Add the widget to any website with a simple embed code. No technical knowledge required."
-              />
+              <WeatherForecast />
             </div>
           </div>
-        </section>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
+            <div className="bg-white rounded-lg shadow-md p-6 flex flex-col items-center text-center">
+              <Calendar className="h-12 w-12 text-blue-500 mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Tour Schedule</h3>
+              <p className="text-gray-600 mb-4">
+                View our upcoming boat tours and check for any weather-related cancellations
+              </p>
+              <Link to="/tours" className="mt-auto">
+                <Button variant="outline" className="w-full">View Schedule</Button>
+              </Link>
+            </div>
+            
+            <div className="bg-white rounded-lg shadow-md p-6 flex flex-col items-center text-center">
+              <AlertCircle className="h-12 w-12 text-amber-500 mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Weather Alerts</h3>
+              <p className="text-gray-600 mb-4">
+                Subscribe to receive notifications about weather-related tour cancellations
+              </p>
+              <Link to="/alerts" className="mt-auto">
+                <Button variant="outline" className="w-full">Subscribe</Button>
+              </Link>
+            </div>
+            
+            <div className="bg-white rounded-lg shadow-md p-6 flex flex-col items-center text-center">
+              <ShieldCheck className="h-12 w-12 text-green-500 mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Safety Information</h3>
+              <p className="text-gray-600 mb-4">
+                Learn about our safety protocols and what to expect on your boat tour
+              </p>
+              <Link to="/safety" className="mt-auto">
+                <Button variant="outline" className="w-full">Read More</Button>
+              </Link>
+            </div>
+          </div>
+          
+          <div className="text-center mt-12">
+            <Link to="/admin">
+              <Button variant="default" size="lg" className="bg-blue-600 hover:bg-blue-700">
+                <BarChart2 className="w-5 h-5 mr-2" />
+                Manage Weather Alerts
+              </Button>
+            </Link>
+          </div>
+        </div>
       </main>
       
-      {/* Footer */}
-      <footer className="bg-gray-50 py-12 px-6">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
-          <div className="flex items-center space-x-2 mb-4 md:mb-0">
-            <Sailboat className="h-5 w-5 text-sea-500" />
-            <span className="font-medium">SafeSailing.io</span>
+      <footer className="bg-gray-900 text-white py-8 mt-12">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="mb-4 md:mb-0">
+              <h3 className="text-xl font-bold">Safe Sailing Tours</h3>
+              <p className="text-gray-400">Weather monitoring and alerts for boat tours</p>
+            </div>
+            <div className="flex space-x-4">
+              <Link to="/admin" className="hover:text-blue-400">Admin</Link>
+              <Link to="/privacy" className="hover:text-blue-400">Privacy</Link>
+              <Link to="/terms" className="hover:text-blue-400">Terms</Link>
+              <Link to="/contact" className="hover:text-blue-400">Contact</Link>
+            </div>
           </div>
-          
-          <div className="text-sm text-gray-500">
-            © {new Date().getFullYear()} SafeSailing.io. All rights reserved.
+          <div className="mt-8 text-center text-gray-400 text-sm">
+            &copy; {new Date().getFullYear()} Safe Sailing Tours. All rights reserved.
           </div>
         </div>
       </footer>
-    </div>
-  );
-};
-
-interface FeatureCardProps {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}
-
-const FeatureCard = ({ icon, title, description }: FeatureCardProps) => {
-  return (
-    <div className="bg-white p-6 rounded-xl border shadow-sm hover:shadow-md transition-shadow animate-fade-in">
-      <div className="bg-gray-50 w-16 h-16 rounded-lg flex items-center justify-center mb-4">
-        {icon}
-      </div>
-      <h3 className="text-xl font-semibold mb-2">{title}</h3>
-      <p className="text-gray-600">{description}</p>
     </div>
   );
 };
