@@ -12,7 +12,8 @@ export const locations: WeatherLocation[] = [
 
 // Function to fetch marine weather data from Open-Meteo marine API
 export const fetchMarineWeather = async (latitude: number, longitude: number): Promise<MarineWeatherData> => {
-  const url = `https://marine-api.open-meteo.com/v1/marine?latitude=${latitude}&longitude=${longitude}&hourly=wave_height,wave_direction,wave_period,wind_wave_height,wind_wave_direction,wind_wave_period,wind_speed_10m,wind_direction_10m,precipitation,pressure_msl&forecast_days=6`;
+  // Updated API endpoint with correct parameter format
+  const url = `https://marine-api.open-meteo.com/v1/marine?latitude=${latitude}&longitude=${longitude}&hourly=wave_height,wave_direction,wave_period,wind_wave_height,wind_wave_direction,wind_wave_period,wind_speed_10m,wind_direction_10m,precipitation&forecast_days=6`;
   
   try {
     const response = await fetch(url);
@@ -29,6 +30,7 @@ export const fetchMarineWeather = async (latitude: number, longitude: number): P
 
 // Function to fetch regular weather data from Open-Meteo weather API
 export const fetchWeatherData = async (latitude: number, longitude: number): Promise<WeatherData> => {
+  // Updated API endpoint with correct parameters
   const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m&hourly=wind_speed_10m,wind_direction_10m&daily=precipitation_sum,pressure_msl_mean&forecast_days=6`;
   
   try {

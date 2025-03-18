@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { 
   locations, 
@@ -14,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Waves, Wind, Droplets, Compass, Gauge } from 'lucide-react';
 import { ChartContainer, ChartLegendContent, ChartTooltipContent, ChartTooltip } from '@/components/ui/chart';
 import { Legend, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from 'recharts';
+import { useToast } from '@/hooks/use-toast';
 
 export const WeatherForecast = () => {
   const [selectedLocation, setSelectedLocation] = useState<WeatherLocation>(locations[0]);
@@ -22,6 +24,7 @@ export const WeatherForecast = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<string>(getForecastDates()[0]);
+  const { toast } = useToast();
   
   const fetchForecastData = async (location: WeatherLocation) => {
     setLoading(true);
@@ -36,8 +39,14 @@ export const WeatherForecast = () => {
       setMarineData(marine);
       setWeatherData(weather);
     } catch (err) {
-      setError('Failed to load weather data. Please try again later.');
+      const errorMessage = 'Failed to load weather data. Please try again later.';
+      setError(errorMessage);
       console.error('Weather fetch error:', err);
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -102,6 +111,24 @@ export const WeatherForecast = () => {
       'Wind Speed': item.wind_speed,
       'Wind Direction': item.wind_direction,
     }));
+  };
+
+  const getPressureData = () => {
+    if (!weatherData) return null;
+    
+    const pressureIndex = weatherData.daily.time.indexOf(selectedDate);
+    if (pressureIndex === -1) return null;
+    
+    return weatherData.daily.pressure_msl_mean[pressureIndex];
+  };
+
+  const getPrecipitationData = () => {
+    if (!weatherData) return null;
+    
+    const precipIndex = weatherData.daily.time.indexOf(selectedDate);
+    if (precipIndex === -1) return null;
+    
+    return weatherData.daily.precipitation_sum[precipIndex];
   };
 
   return (
@@ -316,15 +343,13 @@ export const WeatherForecast = () => {
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      {marineData && weatherData && (
+                      {weatherData && (
                         <div className="grid grid-cols-2 gap-4">
                           <div className="flex flex-col">
                             <span className="text-sm text-muted-foreground">Precipitation</span>
                             <span className="text-2xl font-bold">
                               {formatValueWithUnit(
-                                weatherData.daily.precipitation_sum[
-                                  weatherData.daily.time.indexOf(selectedDate)
-                                ],
+                                getPrecipitationData(),
                                 'mm'
                               )}
                             </span>
@@ -333,9 +358,7 @@ export const WeatherForecast = () => {
                             <span className="text-sm text-muted-foreground">Pressure</span>
                             <span className="text-2xl font-bold">
                               {formatValueWithUnit(
-                                weatherData.daily.pressure_msl_mean[
-                                  weatherData.daily.time.indexOf(selectedDate)
-                                ],
+                                getPressureData(),
                                 'hPa'
                               )}
                             </span>
@@ -382,7 +405,7 @@ export const WeatherForecast = () => {
                             )}.
                           </p>
                           
-                          <div className="flex items-center space-x-4 pt-2">
+                          <div className="flex flex-wrap items-center gap-4 pt-2">
                             <div className="flex items-center gap-1 text-sm">
                               <Waves className="h-4 w-4 text-blue-500" />
                               <span>
@@ -415,9 +438,7 @@ export const WeatherForecast = () => {
                               <Droplets className="h-4 w-4 text-blue-400" />
                               <span>
                                 {formatValueWithUnit(
-                                  weatherData.daily.precipitation_sum[
-                                    weatherData.daily.time.indexOf(selectedDate)
-                                  ],
+                                  getPrecipitationData(),
                                   'mm'
                                 )}
                               </span>
@@ -427,9 +448,7 @@ export const WeatherForecast = () => {
                               <Gauge className="h-4 w-4 text-gray-500" />
                               <span>
                                 {formatValueWithUnit(
-                                  weatherData.daily.pressure_msl_mean[
-                                    weatherData.daily.time.indexOf(selectedDate)
-                                  ],
+                                  getPressureData(),
                                   'hPa'
                                 )}
                               </span>

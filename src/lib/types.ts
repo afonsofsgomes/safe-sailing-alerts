@@ -43,7 +43,7 @@ export interface MarineWeatherData {
   wind_speed_10m: number[];
   wind_direction_10m: number[];
   precipitation: number[];
-  pressure_msl: number[];
+  // Removed pressure_msl as it's not available in the marine hourly endpoint
 }
 
 export interface WeatherData {
