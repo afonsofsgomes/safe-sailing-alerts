@@ -55,7 +55,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
           <AlertDialogAction 
             onClick={handleConfirm}
             className={variant === "delete" 
-              ? "bg-red-500 hover:bg-red-600 text-white" 
+              ? "bg-[#ea384c] hover:bg-[#ea384c]/90 text-white" 
               : "bg-amber-500 hover:bg-amber-600 text-white"
             }
           >
