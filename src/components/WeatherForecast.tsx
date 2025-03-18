@@ -78,12 +78,12 @@ export const WeatherForecast = () => {
   const getWaveData = () => {
     if (!marineData) return [];
     
-    const dailyData = marineData.time
+    const dailyData = marineData.hourly.time
       .map((time, index) => ({
         time,
         date: time.split('T')[0],
-        wave_height: marineData.wave_height[index],
-        wave_period: marineData.wave_period[index],
+        wave_height: marineData.hourly.wave_height[index],
+        wave_period: marineData.hourly.wave_period[index],
       }))
       .filter(item => item.date === selectedDate);
     
@@ -97,12 +97,12 @@ export const WeatherForecast = () => {
   const getWindData = () => {
     if (!marineData || !weatherData) return [];
     
-    const dailyData = marineData.time
+    const dailyData = marineData.hourly.time
       .map((time, index) => ({
         time,
         date: time.split('T')[0],
-        wind_speed: marineData.wind_speed_10m[index],
-        wind_direction: marineData.wind_direction_10m[index],
+        wind_speed: marineData.hourly.wind_speed_10m[index],
+        wind_direction: marineData.hourly.wind_direction_10m[index],
       }))
       .filter(item => item.date === selectedDate);
     
@@ -198,8 +198,8 @@ export const WeatherForecast = () => {
                               <span className="text-2xl font-bold">
                                 {formatValueWithUnit(
                                   getDailyAverageFromHourly(
-                                    marineData.time, 
-                                    marineData.wave_height, 
+                                    marineData.hourly.time, 
+                                    marineData.hourly.wave_height, 
                                     selectedDate
                                   ),
                                   'm'
@@ -211,8 +211,8 @@ export const WeatherForecast = () => {
                               <span className="text-2xl font-bold">
                                 {formatValueWithUnit(
                                   getDailyAverageFromHourly(
-                                    marineData.time, 
-                                    marineData.wave_period, 
+                                    marineData.hourly.time, 
+                                    marineData.hourly.wave_period, 
                                     selectedDate
                                   ),
                                   's'
@@ -224,8 +224,8 @@ export const WeatherForecast = () => {
                               <span className="text-2xl font-bold">
                                 {degreesToCardinal(
                                   getDailyAverageFromHourly(
-                                    marineData.time, 
-                                    marineData.wave_direction, 
+                                    marineData.hourly.time, 
+                                    marineData.hourly.wave_direction, 
                                     selectedDate
                                   )
                                 )}
@@ -285,8 +285,8 @@ export const WeatherForecast = () => {
                               <span className="text-2xl font-bold">
                                 {formatValueWithUnit(
                                   getDailyAverageFromHourly(
-                                    marineData.time, 
-                                    marineData.wind_speed_10m, 
+                                    marineData.hourly.time, 
+                                    marineData.hourly.wind_speed_10m, 
                                     selectedDate
                                   ),
                                   'km/h'
@@ -298,8 +298,8 @@ export const WeatherForecast = () => {
                               <span className="text-2xl font-bold">
                                 {degreesToCardinal(
                                   getDailyAverageFromHourly(
-                                    marineData.time, 
-                                    marineData.wind_direction_10m, 
+                                    marineData.hourly.time, 
+                                    marineData.hourly.wind_direction_10m, 
                                     selectedDate
                                   )
                                 )}
@@ -382,24 +382,24 @@ export const WeatherForecast = () => {
                             Marine conditions for {formatDateTab(selectedDate)} at {selectedLocation.name} show
                             waves of {formatValueWithUnit(
                               getDailyAverageFromHourly(
-                                marineData.time, 
-                                marineData.wave_height, 
+                                marineData.hourly.time, 
+                                marineData.hourly.wave_height, 
                                 selectedDate
                               ),
                               'm'
                             )} 
                             with winds at {formatValueWithUnit(
                               getDailyAverageFromHourly(
-                                marineData.time, 
-                                marineData.wind_speed_10m, 
+                                marineData.hourly.time, 
+                                marineData.hourly.wind_speed_10m, 
                                 selectedDate
                               ),
                               'km/h'
                             )} 
                             from the {degreesToCardinal(
                               getDailyAverageFromHourly(
-                                marineData.time, 
-                                marineData.wind_direction_10m, 
+                                marineData.hourly.time, 
+                                marineData.hourly.wind_direction_10m, 
                                 selectedDate
                               )
                             )}.
@@ -411,8 +411,8 @@ export const WeatherForecast = () => {
                               <span>
                                 {formatValueWithUnit(
                                   getDailyAverageFromHourly(
-                                    marineData.time, 
-                                    marineData.wave_height, 
+                                    marineData.hourly.time, 
+                                    marineData.hourly.wave_height, 
                                     selectedDate
                                   ),
                                   'm'
@@ -425,8 +425,8 @@ export const WeatherForecast = () => {
                               <span>
                                 {formatValueWithUnit(
                                   getDailyAverageFromHourly(
-                                    marineData.time, 
-                                    marineData.wind_speed_10m, 
+                                    marineData.hourly.time, 
+                                    marineData.hourly.wind_speed_10m, 
                                     selectedDate
                                   ),
                                   'km/h'
