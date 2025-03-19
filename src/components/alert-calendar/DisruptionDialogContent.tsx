@@ -7,6 +7,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { DisruptionForm } from '@/components/DisruptionForm';
+import { format } from 'date-fns';
 
 interface DisruptionDialogContentProps {
   isOpen: boolean;
@@ -21,13 +22,17 @@ export const DisruptionDialogContent = ({
   selectedDate,
   onSuccess
 }: DisruptionDialogContentProps) => {
+  const formattedDate = selectedDate 
+    ? format(selectedDate, 'EEEE, MMMM d, yyyy')
+    : 'Selected Date';
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add Disruption</DialogTitle>
+          <DialogTitle>Add Disruption for {formattedDate}</DialogTitle>
           <DialogDescription>
-            Enter details about the disruption.
+            Enter details about the disruption. Note that you cannot create overlapping disruptions for the same day.
           </DialogDescription>
         </DialogHeader>
         <DisruptionForm

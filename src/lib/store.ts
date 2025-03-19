@@ -21,6 +21,7 @@ interface AppState {
   removeDisruption: (id: string) => Promise<void>;
   updateDisruption: (id: string, disruption: Partial<Disruption>) => Promise<void>;
   updateWidgetSettings: (settings: Partial<WidgetSettings>) => Promise<void>;
+  hasDisruptionOnDate: (date: Date, isFullDay: boolean, startTime?: string, endTime?: string) => boolean;
 }
 
 export const useAppStore = create<AppState>()(
@@ -140,12 +141,55 @@ export const useAppStore = create<AppState>()(
           throw error;
         }
       },
+
+      hasDisruptionOnDate: (date: Date, isFullDay: boolean, startTime?: string, endTime?: string) => {
+        const { disruptions } = get();
+        const targetDate = new Date(date);
+        targetDate.setHours(0, 0, 0, 0);
+        
+        const existingDisruptions = disruptions.filter(disruption => {
+          const disruptionDate = new Date(disruption.date);
+          disruptionDate.setHours(0, 0, 0, 0);
+          return disruptionDate.getTime() === targetDate.getTime();
+        });
+        
+        if (existingDisruptions.length === 0) {
+          return false; // No disruptions on this date
+        }
+        
+        if (isFullDay || existingDisruptions.some(d => d.isFullDay)) {
+          return true;
+        }
+        
+        if (startTime && endTime) {
+          const newStartMinutes = convertTimeToMinutes(startTime);
+          const newEndMinutes = convertTimeToMinutes(endTime);
+          
+          return existingDisruptions.some(disruption => {
+            if (!disruption.startTime || !disruption.endTime) return false;
+            
+            const existingStartMinutes = convertTimeToMinutes(disruption.startTime);
+            const existingEndMinutes = convertTimeToMinutes(disruption.endTime);
+            
+            return (
+              (newStartMinutes <= existingEndMinutes && newEndMinutes >= existingStartMinutes)
+            );
+          });
+        }
+        
+        return false;
+      }
     }),
     {
       name: 'boat-tour-alerts-storage',
     }
   )
 );
+
+const convertTimeToMinutes = (time: string) => {
+  const [hours, minutes] = time.split(':').map(Number);
+  return hours * 60 + minutes;
+};
 
 export const getActiveDisruptions = () => {
   const { disruptions } = useAppStore.getState();
