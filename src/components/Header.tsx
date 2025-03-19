@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Sailboat, Menu, LogOut, User } from 'lucide-react';
+import { Ship, Menu, LogOut, User } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { AuthModal } from './auth/AuthModal';
 import {
@@ -49,8 +49,8 @@ export const Header = () => {
       )}
     >
       <div className="flex items-center space-x-1">
-        <Sailboat className="h-6 w-6 text-sea-500" />
-        <span className="font-semibold text-lg">SafeSailing.io</span>
+        <Ship className="h-6 w-6 text-sea-500" />
+        <span className="font-semibold text-lg">SeaYou - Alerts</span>
       </div>
 
       <nav className="hidden md:flex items-center space-x-8">

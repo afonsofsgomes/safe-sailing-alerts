@@ -2,7 +2,7 @@
 import { AlertWidget } from "@/components/AlertWidget";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Sailboat, CloudSun, AlertTriangle, Code } from "lucide-react";
+import { Ship, CloudSun, AlertTriangle, Code } from "lucide-react";
 import { Header } from "@/components/Header";
 
 const Index = () => {
@@ -23,7 +23,7 @@ const Index = () => {
           <div className="mx-auto max-w-2xl text-center">
             <div className="flex justify-center mb-6">
               <div className="bg-white/50 backdrop-blur-sm p-3 rounded-full shadow-sm animate-float">
-                <Sailboat className="h-12 w-12 text-sea-500" />
+                <Ship className="h-12 w-12 text-sea-500" />
               </div>
             </div>
             
@@ -92,12 +92,12 @@ const Index = () => {
       <footer className="bg-gray-50 py-12 px-6">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center">
           <div className="flex items-center space-x-2 mb-4 md:mb-0">
-            <Sailboat className="h-5 w-5 text-sea-500" />
-            <span className="font-medium">SafeSailing.io</span>
+            <Ship className="h-5 w-5 text-sea-500" />
+            <span className="font-medium">SeaYou - Alerts</span>
           </div>
           
           <div className="text-sm text-gray-500">
-            © {new Date().getFullYear()} SafeSailing.io. All rights reserved.
+            © {new Date().getFullYear()} SeaYou - Alerts. All rights reserved.
           </div>
         </div>
       </footer>
