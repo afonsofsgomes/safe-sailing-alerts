@@ -123,17 +123,17 @@ export function Header() {
         )}
         
         {/* Desktop Navigation - Center aligned, only visible on desktop */}
-        <nav className="hidden md:flex items-center justify-center flex-1">
+        <nav className="hidden md:flex items-center justify-center flex-1 gap-8">
           {isAuthenticated && navItems.map((item) => (
             <Link 
               key={item.href}
               to={item.href} 
               className={cn(
-                "text-sm font-medium transition-colors hover:text-primary mx-4",
+                "text-sm font-medium transition-colors hover:text-primary",
                 item.active ? "text-primary" : "text-muted-foreground"
               )}
             >
-              <span className="flex items-center gap-1">
+              <span className="flex items-center gap-2">
                 {item.icon}
                 {item.label}
               </span>
@@ -144,11 +144,11 @@ export function Header() {
             <Link 
               to="/admin/account" 
               className={cn(
-                "text-sm font-medium transition-colors hover:text-primary mx-4",
+                "text-sm font-medium transition-colors hover:text-primary",
                 pathname === "/admin/account" ? "text-primary" : "text-muted-foreground"
               )}
             >
-              <span className="flex items-center gap-1">
+              <span className="flex items-center gap-2">
                 <UserCog className="h-4 w-4" />
                 Account Settings
               </span>
