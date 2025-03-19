@@ -2,7 +2,7 @@
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Trash2, Loader2 } from 'lucide-react';
+import { Trash2, Loader2, User } from 'lucide-react';
 import { Disruption } from '@/lib/types';
 import { useAuth } from '@/lib/auth';
 
@@ -50,6 +50,13 @@ export const DisruptionsList = ({
                   </span>
                 </div>
                 <p className="mt-2">{disruption.reason}</p>
+                
+                {disruption.createdByEmail && (
+                  <div className="mt-1 flex items-center gap-1 text-xs text-gray-500">
+                    <User className="h-3 w-3" />
+                    <span>{disruption.createdByEmail}</span>
+                  </div>
+                )}
               </div>
               {user && (
                 <Button
