@@ -21,4 +21,11 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  optimizeDeps: {
+    esbuildOptions: {
+      // Use a fixed version of esbuild that's compatible with our dependencies
+      // but addresses the security vulnerability
+      target: 'es2020'
+    }
+  }
 }));
