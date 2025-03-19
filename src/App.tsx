@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -5,12 +6,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/lib/auth";
 import { useAuth } from "@/lib/auth";
-import Admin from "./pages/admin";
+import { Admin } from "./pages/admin";
 import Embed from "./pages/Embed";
 import EmbedGenerator from "./pages/EmbedGenerator";
 import NotFound from "./pages/NotFound";
 import { AuthPage } from "./pages/AuthPage";
 import { Analytics } from "./pages/admin/Analytics";
+import { AccountSettingsPage } from "./pages/admin/AccountSettings";
 
 const queryClient = new QueryClient();
 
@@ -52,7 +54,11 @@ function App() {
                   <EmbedGenerator />
                 </ProtectedRoute>
               } />
-              <Route path="/admin/account" element={<Admin.AccountSettingsPage />} />
+              <Route path="/admin/account" element={
+                <ProtectedRoute>
+                  <AccountSettingsPage />
+                </ProtectedRoute>
+              } />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Router>

@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, ShieldAlert, BarChart2 } from 'lucide-react';
+import { Loader2, ShieldAlert, BarChart2, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth';
 import { AuthModal } from '@/components/auth/AuthModal';
@@ -42,12 +42,23 @@ const Admin = () => {
               </p>
             </div>
             
-            <Link to="/admin/analytics">
-              <Button className="flex items-center gap-2">
-                <BarChart2 className="h-4 w-4" />
-                View Analytics
-              </Button>
-            </Link>
+            <div className="flex gap-2">
+              <Link to="/admin/analytics">
+                <Button className="flex items-center gap-2">
+                  <BarChart2 className="h-4 w-4" />
+                  View Analytics
+                </Button>
+              </Link>
+              
+              {user && (
+                <Link to="/admin/account">
+                  <Button variant="outline" className="flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    Account
+                  </Button>
+                </Link>
+              )}
+            </div>
           </div>
           
           {!user && (
