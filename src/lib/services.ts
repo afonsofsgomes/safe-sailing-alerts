@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Disruption, WidgetSettings } from './types';
 
@@ -8,9 +7,7 @@ export const fetchDisruptions = async (): Promise<Disruption[]> => {
     .from('disruptions')
     .select(`
       *,
-      profiles:user_id (
-        email
-      )
+      profiles(email)
     `)
     .order('date', { ascending: true });
 
@@ -26,7 +23,7 @@ export const fetchDisruptions = async (): Promise<Disruption[]> => {
     createdAt: new Date(item.created_at),
     refundProvided: item.refund_provided || false,
     refundAmount: item.refund_amount || 0,
-    createdByEmail: item.profiles ? item.profiles.email : undefined
+    createdByEmail: item.profiles?.email
   }));
 };
 
