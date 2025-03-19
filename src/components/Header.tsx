@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { cn } from '@/lib/utils';
-import { UserCog, User, LayoutDashboard, BarChart2, Settings, Menu, X } from 'lucide-react';
+import { UserCog, User, LayoutDashboard, BarChart2, Settings, Menu } from 'lucide-react';
 import { useState } from 'react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
@@ -53,23 +53,24 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center sm:justify-between sm:space-x-0">
-        <div className="flex-shrink-0 mr-4">
-          <Link to="/" className="hidden font-bold sm:block">
+      <div className="container flex h-16 items-center justify-between">
+        {/* Logo - Always visible, positioned on the left */}
+        <div className="flex-shrink-0">
+          <Link to="/" className="font-bold">
             SeaYou Madeira
           </Link>
         </div>
         
-        {/* Mobile Menu Button */}
-        <div className="sm:hidden">
+        {/* Mobile Menu Button - Only visible on mobile */}
+        {isMobile && (
           <MobileNav open={open} onOpenChange={setOpen}>
             <MobileNavTrigger asChild>
-              <Button variant="ghost" className="px-2">
+              <Button variant="ghost" className="px-2 md:hidden">
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Toggle menu</span>
               </Button>
             </MobileNavTrigger>
-            <MobileNavContent side="left" className="sm:max-w-sm w-[75vw] pt-6">
+            <MobileNavContent side="left" className="w-[75vw] pt-6">
               <div className="px-4 py-2 mb-2">
                 <Link to="/" className="font-bold text-xl" onClick={() => setOpen(false)}>
                   SeaYou Madeira
@@ -119,36 +120,43 @@ export function Header() {
               </div>
             </MobileNavContent>
           </MobileNav>
-        </div>
+        )}
         
-        {/* Desktop Navigation */}
-        <div className="hidden sm:flex flex-1 justify-center">
-          <nav className="flex items-center space-x-4 lg:space-x-6">
-            {isAuthenticated && navItems.map((item) => (
-              <Link 
-                key={item.href}
-                to={item.href} 
-                className={cn(
-                  "text-sm font-medium transition-colors hover:text-primary",
-                  item.active ? "text-primary" : "text-muted-foreground"
-                )}
-              >
-                <span className="flex items-center gap-1">
-                  {item.icon}
-                  {item.label}
-                </span>
-              </Link>
-            ))}
-          </nav>
-        </div>
+        {/* Desktop Navigation - Center aligned, only visible on desktop */}
+        <nav className="hidden md:flex items-center justify-center flex-1">
+          {isAuthenticated && navItems.map((item) => (
+            <Link 
+              key={item.href}
+              to={item.href} 
+              className={cn(
+                "text-sm font-medium transition-colors hover:text-primary mx-4",
+                item.active ? "text-primary" : "text-muted-foreground"
+              )}
+            >
+              <span className="flex items-center gap-1">
+                {item.icon}
+                {item.label}
+              </span>
+            </Link>
+          ))}
+          
+          {isAuthenticated && (
+            <Link 
+              to="/admin/account" 
+              className={cn(
+                "text-sm font-medium transition-colors hover:text-primary mx-4",
+                pathname === "/admin/account" ? "text-primary" : "text-muted-foreground"
+              )}
+            >
+              <span className="flex items-center gap-1">
+                <UserCog className="h-4 w-4" />
+                Account Settings
+              </span>
+            </Link>
+          )}
+        </nav>
         
-        {/* Mobile Logo */}
-        <div className="sm:hidden flex-1 flex justify-center">
-          <Link to="/" className="font-bold">
-            SeaYou Madeira
-          </Link>
-        </div>
-        
+        {/* User Menu - Always on the right */}
         <div className="flex items-center justify-end">
           {isAuthenticated && (
             <DropdownMenu>
