@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { useAppStore } from '@/lib/store';
@@ -11,11 +10,13 @@ import {
   AnalyticsSummary, 
   AnalyticsTabs 
 } from '@/components/analytics';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export const Analytics = () => {
   const { user } = useAuth();
   const disruptions = useAppStore((state) => state.disruptions);
   const fetchData = useAppStore((state) => state.fetchData);
+  const isMobile = useIsMobile();
   const [monthlyData, setMonthlyData] = useState<any[]>([]);
   const [yearlyData, setYearlyData] = useState<any[]>([]);
   const [reasonData, setReasonData] = useState<any[]>([]);
@@ -142,16 +143,16 @@ export const Analytics = () => {
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
       
-      <main className="flex-1 pt-24 pb-12 px-6 max-w-7xl mx-auto w-full">
-        <div className="flex justify-between items-center mb-8">
+      <main className={`flex-1 pt-24 pb-12 px-${isMobile ? '3' : '6'} max-w-7xl mx-auto w-full`}>
+        <div className={`flex ${isMobile ? 'flex-col space-y-2' : 'justify-between items-center'} mb-8`}>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Analytics</h1>
+            <h1 className={`${isMobile ? 'text-2xl' : 'text-3xl'} font-bold text-gray-900`}>Analytics</h1>
             <p className="mt-1 text-gray-600">
               View metrics and insights about disruptions
             </p>
           </div>
           
-          <Link to="/admin">
+          <Link to="/admin" className={isMobile ? 'self-start' : ''}>
             <Button variant="outline" className="flex items-center gap-2">
               <ChevronLeft className="h-4 w-4" />
               Back to Dashboard
