@@ -7,7 +7,7 @@ export const fetchDisruptions = async (): Promise<Disruption[]> => {
     .from('disruptions')
     .select(`
       *,
-      profiles(email)
+      profiles:profile_id(email)
     `)
     .order('date', { ascending: true });
 
@@ -33,10 +33,18 @@ export const createDisruption = async (disruption: Omit<Disruption, 'id' | 'crea
   
   if (!user) throw new Error('User not authenticated');
 
+  // Get the profile id for the current user
+  const { data: profileData } = await supabase
+    .from('profiles')
+    .select('id, email')
+    .eq('id', user.id)
+    .single();
+
   const { data, error } = await supabase
     .from('disruptions')
     .insert({
       user_id: user.id,
+      profile_id: profileData?.id,
       date: disruption.date.toISOString().split('T')[0],
       start_time: disruption.startTime,
       end_time: disruption.endTime,
@@ -60,7 +68,7 @@ export const createDisruption = async (disruption: Omit<Disruption, 'id' | 'crea
     createdAt: new Date(data.created_at),
     refundProvided: data.refund_provided || false,
     refundAmount: data.refund_amount || 0,
-    createdByEmail: undefined
+    createdByEmail: profileData?.email
   };
 };
 

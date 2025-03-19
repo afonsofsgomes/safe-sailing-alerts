@@ -16,6 +16,7 @@ export type Database = {
           end_time: string | null
           id: string
           is_full_day: boolean | null
+          profile_id: string | null
           reason: string
           refund_amount: number | null
           refund_provided: boolean | null
@@ -28,6 +29,7 @@ export type Database = {
           end_time?: string | null
           id?: string
           is_full_day?: boolean | null
+          profile_id?: string | null
           reason: string
           refund_amount?: number | null
           refund_provided?: boolean | null
@@ -40,13 +42,22 @@ export type Database = {
           end_time?: string | null
           id?: string
           is_full_day?: boolean | null
+          profile_id?: string | null
           reason?: string
           refund_amount?: number | null
           refund_provided?: boolean | null
           start_time?: string | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "disruptions_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
