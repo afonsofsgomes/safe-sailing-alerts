@@ -22,56 +22,62 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
-        <Link to="/" className="hidden font-bold sm:block">
-          SeaYou Madeira
-        </Link>
-        <Button variant="ghost" className="sm:hidden">
-          Menu
-        </Button>
-        <nav className="mx-6 flex items-center space-x-4 lg:space-x-6">
-          {isAuthenticated && (
-            <>
-              <Link 
-                to="/admin" 
-                className={cn(
-                  "text-sm font-medium transition-colors hover:text-primary",
-                  pathname === "/admin" ? "text-primary" : "text-muted-foreground"
-                )}
-              >
-                <span className="flex items-center gap-1">
-                  <LayoutDashboard className="h-4 w-4" />
-                  Dashboard
-                </span>
-              </Link>
-              <Link 
-                to="/admin/analytics" 
-                className={cn(
-                  "text-sm font-medium transition-colors hover:text-primary",
-                  pathname === "/admin/analytics" ? "text-primary" : "text-muted-foreground"
-                )}
-              >
-                <span className="flex items-center gap-1">
-                  <BarChart2 className="h-4 w-4" />
-                  Analytics
-                </span>
-              </Link>
-              <Link 
-                to="/admin/widget-settings" 
-                className={cn(
-                  "text-sm font-medium transition-colors hover:text-primary",
-                  pathname === "/admin/widget-settings" ? "text-primary" : "text-muted-foreground"
-                )}
-              >
-                <span className="flex items-center gap-1">
-                  <Settings className="h-4 w-4" />
-                  Widget Settings
-                </span>
-              </Link>
-            </>
-          )}
-        </nav>
-        <div className="flex flex-1 items-center justify-end">
+      <div className="container flex h-16 items-center sm:justify-between sm:space-x-0">
+        <div className="flex-shrink-0 mr-4">
+          <Link to="/" className="hidden font-bold sm:block">
+            SeaYou Madeira
+          </Link>
+          <Button variant="ghost" className="sm:hidden">
+            Menu
+          </Button>
+        </div>
+        
+        <div className="flex-1 flex justify-center">
+          <nav className="flex items-center space-x-4 lg:space-x-6">
+            {isAuthenticated && (
+              <>
+                <Link 
+                  to="/admin" 
+                  className={cn(
+                    "text-sm font-medium transition-colors hover:text-primary",
+                    pathname === "/admin" ? "text-primary" : "text-muted-foreground"
+                  )}
+                >
+                  <span className="flex items-center gap-1">
+                    <LayoutDashboard className="h-4 w-4" />
+                    Dashboard
+                  </span>
+                </Link>
+                <Link 
+                  to="/admin/analytics" 
+                  className={cn(
+                    "text-sm font-medium transition-colors hover:text-primary",
+                    pathname === "/admin/analytics" ? "text-primary" : "text-muted-foreground"
+                  )}
+                >
+                  <span className="flex items-center gap-1">
+                    <BarChart2 className="h-4 w-4" />
+                    Analytics
+                  </span>
+                </Link>
+                <Link 
+                  to="/admin/widget-settings" 
+                  className={cn(
+                    "text-sm font-medium transition-colors hover:text-primary",
+                    pathname === "/admin/widget-settings" ? "text-primary" : "text-muted-foreground"
+                  )}
+                >
+                  <span className="flex items-center gap-1">
+                    <Settings className="h-4 w-4" />
+                    Widget Settings
+                  </span>
+                </Link>
+              </>
+            )}
+          </nav>
+        </div>
+        
+        <div className="flex items-center justify-end">
           {isAuthenticated && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
