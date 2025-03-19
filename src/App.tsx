@@ -13,6 +13,7 @@ import NotFound from "./pages/NotFound";
 import { AuthPage } from "./pages/AuthPage";
 import { Analytics } from "./pages/admin/Analytics";
 import { AccountSettingsPage } from "./pages/admin/AccountSettings";
+import { WidgetSettings } from "./pages/admin/WidgetSettings";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,11 @@ function App() {
               <Route path="/admin/analytics" element={
                 <ProtectedRoute>
                   <Analytics />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/widget-settings" element={
+                <ProtectedRoute>
+                  <WidgetSettings />
                 </ProtectedRoute>
               } />
               <Route path="/embed" element={<Embed />} />
