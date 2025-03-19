@@ -10,7 +10,7 @@ import { format } from 'date-fns';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { BarChart2, PieChartIcon, Calendar, ChevronLeft, DollarSign } from 'lucide-react';
+import { BarChart2, PieChartIcon, Calendar, ChevronLeft, DollarSign, TrendingUp } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 export const Analytics = () => {
@@ -18,9 +18,11 @@ export const Analytics = () => {
   const disruptions = useAppStore((state) => state.disruptions);
   const fetchData = useAppStore((state) => state.fetchData);
   const [monthlyData, setMonthlyData] = useState<any[]>([]);
+  const [yearlyData, setYearlyData] = useState<any[]>([]);
   const [reasonData, setReasonData] = useState<any[]>([]);
   const [typeData, setTypeData] = useState<any[]>([]);
   const [refundData, setRefundData] = useState<any[]>([]);
+  const [yearlyRefundData, setYearlyRefundData] = useState<any[]>([]);
   const [totalRefunds, setTotalRefunds] = useState<number>(0);
   const [refundCount, setRefundCount] = useState<number>(0);
   const [averageRefund, setAverageRefund] = useState<number>(0);
@@ -48,6 +50,23 @@ export const Analytics = () => {
     }));
     
     setMonthlyData(monthlyDataArray);
+    
+    // Process yearly data
+    const yearCounts: {[key: string]: number} = {};
+    
+    data.forEach(disruption => {
+      const year = format(new Date(disruption.date), 'yyyy');
+      yearCounts[year] = (yearCounts[year] || 0) + 1;
+    });
+    
+    const yearlyDataArray = Object.keys(yearCounts)
+      .sort()
+      .map(year => ({
+        year,
+        count: yearCounts[year]
+      }));
+    
+    setYearlyData(yearlyDataArray);
     
     // Process reason data
     const reasonCounts: {[key: string]: number} = {};
@@ -95,6 +114,23 @@ export const Analytics = () => {
     }));
     
     setRefundData(refundDataArray);
+    
+    // Yearly refund data
+    const yearlyRefunds: {[key: string]: number} = {};
+    
+    refundsProvided.forEach(disruption => {
+      const year = format(new Date(disruption.date), 'yyyy');
+      yearlyRefunds[year] = (yearlyRefunds[year] || 0) + (disruption.refundAmount || 0);
+    });
+    
+    const yearlyRefundDataArray = Object.keys(yearlyRefunds)
+      .sort()
+      .map(year => ({
+        year,
+        amount: yearlyRefunds[year]
+      }));
+    
+    setYearlyRefundData(yearlyRefundDataArray);
   };
   
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
@@ -174,6 +210,10 @@ export const Analytics = () => {
               <BarChart2 className="h-4 w-4" />
               Monthly Trends
             </TabsTrigger>
+            <TabsTrigger value="yearly" className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Yearly Analysis
+            </TabsTrigger>
             <TabsTrigger value="reasons" className="flex items-center gap-2">
               <PieChartIcon className="h-4 w-4" />
               Disruption Reasons
@@ -209,6 +249,88 @@ export const Analytics = () => {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+          
+          <TabsContent value="yearly">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Yearly Disruption Trends</CardTitle>
+                  <CardDescription>Number of disruptions per year</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[400px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={yearlyData} margin={{ top: 20, right: 30, left: 20, bottom: 30 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="year" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="count" name="Number of Disruptions" fill="#8884D8" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle>Yearly Refund Amounts</CardTitle>
+                  <CardDescription>Total refund amount per year</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[400px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={yearlyRefundData} margin={{ top: 20, right: 30, left: 20, bottom: 30 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="year" />
+                        <YAxis />
+                        <Tooltip formatter={(value) => [`€${value}`, 'Refund Amount']} />
+                        <Legend />
+                        <Line type="monotone" dataKey="amount" name="Refund Amount (€)" stroke="#F59E0B" strokeWidth={2} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card className="md:col-span-2">
+                <CardHeader>
+                  <CardTitle>Year-over-Year Comparison</CardTitle>
+                  <CardDescription>Disruptions and refunds by year</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[400px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart 
+                        data={yearlyData.map(item => {
+                          const refundItem = yearlyRefundData.find(r => r.year === item.year);
+                          return {
+                            year: item.year,
+                            disruptions: item.count,
+                            refunds: refundItem ? refundItem.amount : 0
+                          };
+                        })}
+                        margin={{ top: 20, right: 30, left: 20, bottom: 30 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="year" />
+                        <YAxis yAxisId="left" orientation="left" stroke="#8884D8" />
+                        <YAxis yAxisId="right" orientation="right" stroke="#F59E0B" />
+                        <Tooltip formatter={(value, name) => [
+                          name === 'refunds' ? `€${value}` : value,
+                          name === 'refunds' ? 'Refund Amount' : 'Disruptions'
+                        ]} />
+                        <Legend />
+                        <Bar yAxisId="left" dataKey="disruptions" name="Disruptions" fill="#8884D8" />
+                        <Bar yAxisId="right" dataKey="refunds" name="Refund Amount (€)" fill="#F59E0B" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
           
           <TabsContent value="reasons">
