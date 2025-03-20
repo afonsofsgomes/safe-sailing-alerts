@@ -1,16 +1,16 @@
-
 import { useEffect, useState } from 'react';
 import { formatDisruptionDate, formatDisruptionTime, getActiveDisruptions, useAppStore } from '@/lib/store';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface AlertWidgetProps {
   className?: string;
   standalone?: boolean;
+  showFallback?: boolean;
 }
 
-export const AlertWidget = ({ className, standalone = false }: AlertWidgetProps) => {
+export const AlertWidget = ({ className, standalone = false, showFallback = false }: AlertWidgetProps) => {
   const activeDisruptions = getActiveDisruptions();
   const widgetSettings = useAppStore((state) => state.widgetSettings);
   const [mounted, setMounted] = useState(false);
@@ -22,7 +22,41 @@ export const AlertWidget = ({ className, standalone = false }: AlertWidgetProps)
 
   if (!mounted) return null;
   
-  if (activeDisruptions.length === 0) return null;
+  if (activeDisruptions.length === 0) {
+    if (!showFallback) return null;
+    
+    // Fallback message when no disruptions are active
+    return (
+      <div 
+        className={cn(
+          'alert-widget overflow-hidden',
+          'rounded-lg',
+          'shadow-lg',
+          'font-sans',
+          'border',
+          isMobile ? 'p-3 text-sm' : 'p-4',
+          'text-white',
+          'bg-green-500',
+          standalone ? (isMobile ? 'w-full mx-auto my-2' : 'max-w-lg mx-auto my-4') : '',
+          className
+        )}
+      >
+        <div className="relative z-10">
+          <div className={`flex items-start ${isMobile ? 'gap-2' : 'gap-3'}`}>
+            <CheckCircle className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'} mt-0.5 flex-shrink-0`} />
+            <div>
+              <h3 className={`font-semibold ${isMobile ? 'text-base' : 'text-lg'}`}>
+                All Services Operating Normally
+              </h3>
+              <p className={`${isMobile ? 'text-xs' : 'text-sm'} mt-1 opacity-90`}>
+                There are currently no service alerts. All routes and services are running as scheduled.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const getBorderRadiusClass = () => {
     switch (widgetSettings.borderRadius) {

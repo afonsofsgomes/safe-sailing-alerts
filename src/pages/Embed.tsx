@@ -50,7 +50,11 @@ function EmbedWidget() {
 
   return (
     <div className="embed-widget-container pb-3" ref={containerRef}>
-      <AlertWidget standalone={true} className={isMobile ? "mobile-alert-widget" : ""} />
+      <AlertWidget 
+        standalone={true} 
+        className={isMobile ? "mobile-alert-widget" : ""}
+        showFallback={true}
+      />
     </div>
   );
 }

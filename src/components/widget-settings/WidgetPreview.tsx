@@ -41,7 +41,11 @@ export const WidgetPreview = ({ className }: WidgetPreviewProps) => {
       
       <div className={`overflow-hidden ${previewMode === 'mobile' ? 'max-w-[375px] mx-auto border border-border rounded-lg' : ''}`}>
         <div className={previewMode === 'mobile' ? 'w-full pb-2' : 'bg-white p-6 pb-8 rounded-xl shadow-sm border overflow-hidden'}>
-          <AlertWidget standalone={true} className={previewMode === 'mobile' ? 'mobile-alert-widget' : ''} />
+          <AlertWidget 
+            standalone={true} 
+            className={previewMode === 'mobile' ? 'mobile-alert-widget' : ''}
+            showFallback={true}
+          />
         </div>
       </div>
       
