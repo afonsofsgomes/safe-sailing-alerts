@@ -10,7 +10,11 @@ function EmbedWidget() {
   const isMobile = useIsMobile();
   
   useEffect(() => {
+    // Fetch data on mount
     fetchData();
+    
+    // Add a log to check if data is being fetched
+    console.log('Embed widget mounted, fetching data');
   }, [fetchData]);
 
   useEffect(() => {
@@ -18,6 +22,7 @@ function EmbedWidget() {
     const sendHeightToParent = () => {
       if (window.parent !== window && containerRef.current) {
         const height = containerRef.current.offsetHeight;
+        console.log('Sending height to parent:', height);
         window.parent.postMessage(
           { type: 'safesailing-widget-height', height }, 
           '*'
@@ -54,7 +59,7 @@ function EmbedWidget() {
   }, [isMobile]);
 
   return (
-    <div className="embed-widget-container pb-3" ref={containerRef}>
+    <div className="embed-widget-container pb-3" ref={containerRef} style={{ minHeight: '50px' }}>
       <AlertWidget 
         standalone={true} 
         className={isMobile ? "mobile-alert-widget" : ""}

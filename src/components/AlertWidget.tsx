@@ -45,11 +45,11 @@ export const AlertWidget = ({ className, standalone = false, showFallback = fals
           'font-sans',
           'border',
           isMobile ? 'p-3 text-sm' : 'p-4',
-          'text-white',
-          'bg-green-500',
+          'text-white bg-green-500', // Explicitly set text color to white and background to green
           standalone ? (isMobile ? 'w-full mx-auto my-2' : 'max-w-lg mx-auto my-4') : '',
           className
         )}
+        style={{ backgroundColor: '#10B981' }} // Explicitly set a background color
       >
         <div className="relative z-10">
           <div className={`flex items-start ${isMobile ? 'gap-2' : 'gap-3'}`}>
@@ -165,21 +165,22 @@ export const AlertWidget = ({ className, standalone = false, showFallback = fals
         getBorderWidthClass(),
         getLayoutClasses(),
         getAnimationClass(),
-        'text-white',
+        'text-white', // Explicitly set text color to white
         isMobile ? 'text-sm' : '',
         standalone ? (isMobile ? 'w-full mx-auto my-2' : 'max-w-lg mx-auto my-4') : '',
         className
       )}
       style={{ 
-        backgroundColor: widgetSettings.primaryColor,
-        borderColor: widgetSettings.accentColor,
+        backgroundColor: widgetSettings.primaryColor || '#0EA5E9', // Ensure there's a default color
+        borderColor: widgetSettings.accentColor || '#F59E0B',
+        color: 'white' // Explicitly set text color in inline style as well
       }}
     >
       <div className="relative z-10">
         <div className={`flex items-start ${isMobile ? 'gap-2' : 'gap-3'}`}>
           {widgetSettings.showIcon && (
             <AlertTriangle className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'} mt-0.5 flex-shrink-0`} 
-              style={{ color: widgetSettings.accentColor }} />
+              style={{ color: widgetSettings.accentColor || '#F59E0B' }} />
           )}
           <div>
             <h3 className={`font-semibold ${isMobile ? 'text-base' : 'text-lg'}`}>
@@ -220,7 +221,7 @@ export const AlertWidget = ({ className, standalone = false, showFallback = fals
       {widgetSettings.animation === 'wave' && (
         <div 
           className="wave-animation animate-wave" 
-          style={{ '--wave-color': widgetSettings.accentColor } as React.CSSProperties}
+          style={{ '--wave-color': widgetSettings.accentColor || '#F59E0B' } as React.CSSProperties}
         />
       )}
     </div>

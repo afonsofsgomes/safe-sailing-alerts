@@ -28,11 +28,22 @@
     // Add event listener to receive height from the iframe and handle resize
     window.addEventListener('message', (event) => {
       // Only accept messages from our own origin
-      if (event.origin !== iframe.src.split('/').slice(0, 3).join('/')) return;
+      const iframeOrigin = iframe.src.split('/').slice(0, 3).join('/');
+      console.log('Message received, origin:', event.origin, 'expected:', iframeOrigin);
+      
+      // Less strict origin check for development
+      if (event.origin !== iframeOrigin && 
+          !event.origin.includes('localhost') && 
+          !iframeOrigin.includes('localhost')) {
+        console.log('Origin mismatch, ignoring message');
+        return;
+      }
       
       if (event.data && event.data.type === 'safesailing-widget-height') {
         console.log('Received height update:', event.data.height);
-        iframe.style.height = event.data.height + 'px';
+        // Set minimum height to prevent collapse
+        const newHeight = Math.max(event.data.height, 100);
+        iframe.style.height = newHeight + 'px';
       }
     });
     
