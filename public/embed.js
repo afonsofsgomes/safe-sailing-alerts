@@ -20,6 +20,7 @@
     iframe.style.border = 'none';
     iframe.style.overflow = 'hidden';
     iframe.style.display = 'block'; // Ensure the iframe is a block element
+    iframe.style.height = '150px'; // Set an initial height
     iframe.scrolling = 'no';
     iframe.allowFullscreen = false;
     iframe.title = 'SafeSailing Alert Widget';
@@ -30,6 +31,7 @@
       if (event.origin !== iframe.src.split('/').slice(0, 3).join('/')) return;
       
       if (event.data && event.data.type === 'safesailing-widget-height') {
+        console.log('Received height update:', event.data.height);
         iframe.style.height = event.data.height + 'px';
       }
     });
@@ -77,6 +79,8 @@
       // Fallback to body
       document.body.insertBefore(container, document.body.firstChild);
     }
+    
+    console.log('Alert widget embedded successfully');
   };
 
   // Initialize when DOM is ready

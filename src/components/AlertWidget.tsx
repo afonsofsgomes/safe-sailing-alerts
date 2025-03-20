@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { formatDisruptionDate, formatDisruptionTime, getActiveDisruptions, useAppStore } from '@/lib/store';
 import { AlertTriangle, CheckCircle } from 'lucide-react';
@@ -18,12 +19,21 @@ export const AlertWidget = ({ className, standalone = false, showFallback = fals
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    console.log('AlertWidget mounted, active disruptions:', activeDisruptions.length);
+    console.log('showFallback:', showFallback);
+  }, [activeDisruptions.length, showFallback]);
 
   if (!mounted) return null;
   
+  console.log('Rendering AlertWidget, active disruptions:', activeDisruptions.length);
+  
   if (activeDisruptions.length === 0) {
-    if (!showFallback) return null;
+    if (!showFallback) {
+      console.log('No disruptions and no fallback - rendering null');
+      return null;
+    }
+    
+    console.log('No disruptions but showing fallback');
     
     // Fallback message when no disruptions are active
     return (
